@@ -26,8 +26,9 @@ if (!firebase.apps.length) {
 export default function App() {
   LogBox.ignoreLogs(['Setting a timer']);
   const [data, setData] = useState([]);
+  const [limit, setLimit] = useState(0);
   //color palette for text boxes
-  const colors =[`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
+  const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
   let x = [];
 
@@ -64,14 +65,21 @@ export default function App() {
               words
             });
           }
-          setData(x);
+           setData(x);
         }
-        console.log("data looks like this ", data);
+        //console.log("x looks like this ", x);
       }
     } catch (e) {
       console.log("No data in local storage " + e);
     }
 
+  }
+
+  const addData = () => {
+    console.log("in add Data");
+    let x = limit;
+    setLimit(x+3);
+    return;
   }
 
   useEffect(() => {
@@ -85,32 +93,36 @@ export default function App() {
         storeData("harrypotter", JSON.stringify(x));
       }
       //data might show empty as we are using async functions
-      else console.log("cant find books || local data -----> " + data);
+      //else console.log("cant find books || local data -----> " + data);
     });
   }, []);
 
   const Elipse = ({ id, name, words }) => (
     <View style={{ padding: 4 }}>
-      {parseInt(id) % 2 == 0 ?
-        <View style={{ alignSelf: "flex-start", maxWidth: "90%", backgroundColor: colors[parseInt(id)%8], borderRadius:10, marginLeft:7, padding:10 }}>
-            <Text style={{ fontWeight: "bold" }}>
+      
+        { (parseInt(id) <= limit) ? //using ternary inside a ternary oprtr.
+          (parseInt(id) % 2 == 0) ?
+        <View style={{ alignSelf: "flex-start", maxWidth: "90%", backgroundColor: colors[parseInt(id) % 8], borderRadius: 10, marginLeft: 7, padding: 10 }}>
+          <Text style={{ fontWeight: "bold" }}>
             {name}
-           </Text>
+          </Text>
           <Text >
             {id}
             {words}
           </Text>
         </View>
         :
-        <View style={{ alignSelf: "flex-end", maxWidth: "90%", backgroundColor: colors[parseInt(id)%8], borderRadius:10, marginRight:7, padding:10 }}>
+        <View style={{ alignSelf: "flex-end", maxWidth: "90%", backgroundColor: colors[parseInt(id) % 8], borderRadius: 10, marginRight: 7, padding: 10 }}>
           <Text style={{ fontWeight: "bold" }}>
             {name}
-           </Text>
+          </Text>
           <Text>
             {id}
             {words}
           </Text>
         </View>
+        : 
+        null
       }
     </View>
   )
@@ -128,10 +140,11 @@ export default function App() {
               id={item.id}
             />}
         />
-        
-      <View>
-        <Button title="press to load more texts"/>
-      </View>
+
+        <View>
+          <Button title="press to load more texts"
+            onPress={() => addData()} />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -140,7 +153,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    flex:1,
+    flex: 1,
     justifyContent: 'center',
     marginTop: Platform.OS === "android" ? 40 : 0,
   },
