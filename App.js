@@ -130,7 +130,7 @@ export default function App() {
     const db = firebase.firestore();
     getData("harrypotter");
     db.collection("books").doc("harrypotter").get().then((doc) => {
-      if (doc.exists && x.length == 0) {
+      if (doc.exists && x.length > 0) {
         x = doc.data().a;
         storeData("harrypotter", JSON.stringify(x));
       }

@@ -1,4 +1,4 @@
-import 'dotenv/config';
+
 export default{
   "expo": {
     "name": "reader",
@@ -31,14 +31,14 @@ export default{
       "favicon": "./app/assets/favicon.png"
     },
     "extra":{
-      apiKey: process.env.API_KEY,
-    authDomain: process.env.AUTH_DOMAIN,
-    databaseURL: process.env.PROJECT_ID,
-    projectId: process.env.PROJECT_ID,
-    storageBucket: process.env.STORAGE_BUCKET,
-    messagingSenderId: process.env.MESSAGING_SENDER_ID,
-    appId: process.env.APP_ID,
-    measurementId: process.env.MEASUREMENT_ID
+      apiKey: "AIzaSyC9fNx3sW9G8rxKfpvMCnRP8AxQ_I4d510",
+    authDomain: "learning-29ccf.firebaseapp.com",
+    databaseURL: " https://learning-29ccf-default-rtdb.firebaseio.com",
+    projectId:  "learning-29ccf",
+    storageBucket: "learning-29ccf.appspot.com",
+    messagingSenderId: "155925228676",
+    appId: "web:95e95ebb56e457500c26d1",
+    measurementId:"G-Q8V5JY766T"
     }
   }
 };
