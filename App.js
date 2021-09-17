@@ -1,9 +1,8 @@
 //this edit is only visible on slave branch
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, FlatList, LogBox, Platform, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, FlatList, LogBox, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
+import Constants from 'expo-constants';
 import firebase from "@firebase/app";
 import "@firebase/auth";
 import "@firebase/firestore";
@@ -11,26 +10,56 @@ import "@firebase/firestore";
 //u hv to hide these vals., see the liked tweet
 if (!firebase.apps.length) {
   firebase.initializeApp({
-    apiKey: "AIzaSyC9fNx3sW9G8rxKfpvMCnRP8AxQ_I4d510",
-    authDomain: "learning-29ccf.firebaseapp.com",
-    databaseURL: "https://learning-29ccf-default-rtdb.firebaseio.com",
-    projectId: "learning-29ccf",
-    storageBucket: "learning-29ccf.appspot.com",
-    messagingSenderId: "155925228676",
-    appId: "1:155925228676:web:95e95ebb56e457500c26d1",
-    measurementId: "G-Q8V5JY766T"
+    apiKey: Constants.manifest.extra.apiKey,
+    authDomain: Constants.manifest.extra.authDomain,
+    databaseURL:Constants.manifest.extra.datatbaseURL,
+    projectId: Constants.manifest.extra.projectId,
+    storageBucket: Constants.manifest.extra.storageBucket,
+    messagingSenderId: Constants.manifest.extra.messagingSenderId,
+    appId: Constants.manifest.extra.appId,
+    measurementId: Constants.manifest.extra.measurementId
   });
 }
-
 
 export default function App() {
   LogBox.ignoreLogs(['Setting a timer']);
   const [data, setData] = useState([]);
+  const [start, setStart] = useState(0);
   const [limit, setLimit] = useState(0);
   //color palette for text boxes
   const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
   let x = [];
+
+  //we can write {item} here and HAVE TO use item.attr_name inside 
+  const Box = ({ item }) => (
+    <View style={{ padding: 4 }}>
+      {(parseInt(item.id) <= limit && parseInt(item.id) >= start) ? //using ternary inside a ternary oprtr.
+        (parseInt(item.id) % 2 == 0) ?
+          <View style={{ alignSelf: "flex-start", maxWidth: "90%", backgroundColor: colors[parseInt(item.id) % 8], borderRadius: 10, marginLeft: 7, padding: 10 }}>
+            <Text style={{ fontWeight: "bold" }}>
+              {item.name}
+            </Text>
+            <Text >
+              {item.id}
+              {item.words}
+            </Text>
+          </View>
+          :
+          <View style={{ alignSelf: "flex-end", maxWidth: "90%", backgroundColor: colors[parseInt(item.id) % 8], borderRadius: 10, marginRight: 7, padding: 10 }}>
+            <Text style={{ fontWeight: "bold" }}>
+              {item.name}
+            </Text>
+            <Text>
+              {item.id}
+              {item.words}
+            </Text>
+          </View>
+        :
+        null
+      }
+    </View>
+  )
 
   //key is the name of the doc in firestore
   const storeData = async (key, value) => {
@@ -65,7 +94,7 @@ export default function App() {
               words
             });
           }
-           setData(x);
+          setData(x);
         }
         //console.log("x looks like this ", x);
       }
@@ -74,17 +103,30 @@ export default function App() {
     }
 
   }
-
-  const addData = () => {
+  const addData = async () => {
     console.log("in add Data");
+    try{
+      setStart(parseInt(await AsyncStorage.getItem("harrypotter_start")));
+    }
+    catch(e){
+      console.log("data not found " + e);
+    }
+    finally{
+      setLimit(start+5);
+    }
     let x = limit;
-    setLimit(x+3);
+    if(x > 5 ) setLimit(x + 5);
+    setStart(x);
+    if (limit > 5) {
+      console.log("storing 'start'");
+      storeData("harrypotter_start", (limit - 5).toString());
+    }
     return;
   }
 
   useEffect(() => {
     // we can't use await inside non-async function(.getItem() still works), better call an async function from here
-    console.log("*****************************WORKING*************************");
+    console.log("************************ WORKING *************************");
     const db = firebase.firestore();
     getData("harrypotter");
     db.collection("books").doc("harrypotter").get().then((doc) => {
@@ -96,54 +138,20 @@ export default function App() {
       //else console.log("cant find books || local data -----> " + data);
     });
   }, []);
-
-  const Elipse = ({ id, name, words }) => (
-    <View style={{ padding: 4 }}>
-      
-        { (parseInt(id) <= limit) ? //using ternary inside a ternary oprtr.
-          (parseInt(id) % 2 == 0) ?
-        <View style={{ alignSelf: "flex-start", maxWidth: "90%", backgroundColor: colors[parseInt(id) % 8], borderRadius: 10, marginLeft: 7, padding: 10 }}>
-          <Text style={{ fontWeight: "bold" }}>
-            {name}
-          </Text>
-          <Text >
-            {id}
-            {words}
-          </Text>
-        </View>
-        :
-        <View style={{ alignSelf: "flex-end", maxWidth: "90%", backgroundColor: colors[parseInt(id) % 8], borderRadius: 10, marginRight: 7, padding: 10 }}>
-          <Text style={{ fontWeight: "bold" }}>
-            {name}
-          </Text>
-          <Text>
-            {id}
-            {words}
-          </Text>
-        </View>
-        : 
-        null
-      }
-    </View>
-  )
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <FlatList
           data={data}
           keyExtractor={item => item.id}
-          renderItem={({ item }) =>
-            <Elipse
-              name={item.name}
-              words={item.words}
-              id={item.id}
-            />}
+          renderItem={Box}
         />
-
         <View>
           <Button title="press to load more texts"
-            onPress={() => addData()} />
+            onPress={addData} />
+          <Button title="from start ?"
+            onPress={() => {setLimit(5);setStart(1);}} 
+            color={"red"}/>
         </View>
       </View>
     </SafeAreaView>
