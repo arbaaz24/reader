@@ -7,7 +7,7 @@ import firebase from "@firebase/app";
 import "@firebase/auth";
 import "@firebase/firestore";
 
-//u hv to hide these vals., see the liked tweet
+//you have to hide these vals., see the liked tweet
 if (!firebase.apps.length) {
   firebase.initializeApp({
     apiKey: Constants.manifest.extra.apiKey,
@@ -25,7 +25,7 @@ export default function App() {
   LogBox.ignoreLogs(['Setting a timer']);
   const [data, setData] = useState([]);
   const [limit, setLimit] = useState(null);
-  //to mamke sure we dont sotre limit twice when from top is presssed
+  //to make sure we dont sotre limit twice when from top is presssed
   const [fromTop, setFromTop] = useState(false);
   //color palette for text boxes
   const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
