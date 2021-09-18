@@ -24,8 +24,7 @@ if (!firebase.apps.length) {
 export default function App() {
   LogBox.ignoreLogs(['Setting a timer']);
   const [data, setData] = useState([]);
-  const [start, setStart] = useState(0);
-  const [limit, setLimit] = useState(0);
+  const [limit, setLimit] = useState(null);
   //color palette for text boxes
   const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
@@ -34,7 +33,7 @@ export default function App() {
   //we can write {item} here and HAVE TO use item.attr_name inside 
   const Box = ({ item }) => (
     <View style={{ padding: 4 }}>
-      {(parseInt(item.id) <= limit && parseInt(item.id) >= start) ? //using ternary inside a ternary oprtr.
+      {(parseInt(item.id) <= limit) ? //using ternary inside a ternary oprtr.
         (parseInt(item.id) % 2 == 0) ?
           <View style={{ alignSelf: "flex-start", maxWidth: "90%", backgroundColor: colors[parseInt(item.id) % 8], borderRadius: 10, marginLeft: 7, padding: 10 }}>
             <Text style={{ fontWeight: "bold" }}>
@@ -72,6 +71,7 @@ export default function App() {
   }
   const getData = async (key) => {
     let value = [];
+    console.log("in getDATA()");
     try {
       //getting data (in JSON) from  local storage
       value = await AsyncStorage.getItem(key);
@@ -103,23 +103,22 @@ export default function App() {
     }
 
   }
+
   const addData = async () => {
     console.log("in add Data");
     try{
-      setStart(parseInt(await AsyncStorage.getItem("harrypotter_start")));
+      let n = await AsyncStorage.getItem("harrypotter_start");
+      if(n!= null) setLimit(parseInt(n) + 5);
+      console.log("limit -> " + limit);
     }
     catch(e){
       console.log("data not found " + e);
     }
     finally{
-      setLimit(start+5);
-    }
-    let x = limit;
-    if(x > 5 ) setLimit(x + 5);
-    setStart(x);
-    if (limit > 5) {
-      console.log("storing 'start'");
-      storeData("harrypotter_start", (limit - 5).toString());
+      if(limit != null){
+      console.log("storing limit");
+      storeData("harrypotter_start", (limit).toString());
+      }
     }
     return;
   }
@@ -150,7 +149,7 @@ export default function App() {
           <Button title="press to load more texts"
             onPress={addData} />
           <Button title="from start ?"
-            onPress={() => {setLimit(5);setStart(1);}} 
+            onPress={() => {setLimit(5);}} 
             color={"red"}/>
         </View>
       </View>
