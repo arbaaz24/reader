@@ -12,7 +12,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp({
     apiKey: Constants.manifest.extra.apiKey,
     authDomain: Constants.manifest.extra.authDomain,
-    databaseURL:Constants.manifest.extra.datatbaseURL,
+    databaseURL: Constants.manifest.extra.datatbaseURL,
     projectId: Constants.manifest.extra.projectId,
     storageBucket: Constants.manifest.extra.storageBucket,
     messagingSenderId: Constants.manifest.extra.messagingSenderId,
@@ -25,6 +25,8 @@ export default function App() {
   LogBox.ignoreLogs(['Setting a timer']);
   const [data, setData] = useState([]);
   const [limit, setLimit] = useState(null);
+  //to mamke sure we dont sotre limit twice when from top is presssed
+  const [fromTop, setFromTop] = useState(false);
   //color palette for text boxes
   const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
@@ -64,14 +66,14 @@ export default function App() {
   const storeData = async (key, value) => {
     try {
       await AsyncStorage.setItem(key, value);
-      console.log("\ndata stored successfully\n");
+      console.log("data stored successfully\n");
     } catch (e) {
       console.log("error storing data" + e);
     }
   }
   const getData = async (key) => {
     let value = [];
-    console.log("in getDATA()");
+    console.log("in getData()");
     try {
       //getting data (in JSON) from  local storage
       value = await AsyncStorage.getItem(key);
@@ -106,18 +108,19 @@ export default function App() {
 
   const addData = async () => {
     console.log("in add Data");
-    try{
+    try {
       let n = await AsyncStorage.getItem("harrypotter_start");
-      if(n!= null) setLimit(parseInt(n) + 5);
+      if (n != null) setLimit(parseInt(n) + 5);
       console.log("limit -> " + limit);
     }
-    catch(e){
+    catch (e) {
       console.log("data not found " + e);
     }
-    finally{
-      if(limit != null){
-      console.log("storing limit");
-      storeData("harrypotter_start", (limit).toString());
+    finally {
+      if (limit != null) {
+        console.log("storing limit");
+        if (!fromTop) storeData("harrypotter_start", (limit).toString());
+        else setFromTop(false);
       }
     }
     return;
@@ -129,14 +132,20 @@ export default function App() {
     const db = firebase.firestore();
     getData("harrypotter");
     db.collection("books").doc("harrypotter").get().then((doc) => {
-      if (doc.exists && x.length > 0) {
+      if (doc.exists && x.length == 0) {
         x = doc.data().a;
-        storeData("harrypotter", JSON.stringify(x));
+        if (!fromTop) storeData("harrypotter", JSON.stringify(x));
+        else setFromTop(false);
       }
       //data might show empty as we are using async functions
       //else console.log("cant find books || local data -----> " + data);
     });
   }, []);
+
+  const restart = () => {
+    storeData("harrypotter_start", "5");
+    setFromTop(true);
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -146,11 +155,11 @@ export default function App() {
           renderItem={Box}
         />
         <View>
-          <Button title="press to load more texts"
+          <Button title="Press x2"
             onPress={addData} />
           <Button title="from start ?"
-            onPress={() => {setLimit(5);}} 
-            color={"red"}/>
+            onPress={restart}
+            color={"red"} />
         </View>
       </View>
     </SafeAreaView>
