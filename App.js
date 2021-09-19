@@ -25,17 +25,18 @@ export default function App() {
   LogBox.ignoreLogs(['Setting a timer']);
   const [data, setData] = useState([]);
   const [limit, setLimit] = useState(null);
+  
   //to make sure we dont sotre limit twice when from top is presssed
   const [fromTop, setFromTop] = useState(false);
   //color palette for text boxes
   const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
   let x = [];
-
+  let flatlist;
   //we can write {item} here and HAVE TO use item.attr_name inside 
   const Box = ({ item }) => (
     <View style={{ padding: 4 }}>
-      {(parseInt(item.id) <= limit) ? //using ternary inside a ternary oprtr.
+      {(parseInt(item.id) <= limit)  ? //using ternary inside a ternary oprtr.
         (parseInt(item.id) % 2 == 0) ?
           <View style={{ alignSelf: "flex-start", maxWidth: "90%", backgroundColor: colors[parseInt(item.id) % 8], borderRadius: 10, marginLeft: 7, padding: 10 }}>
             <Text style={{ fontWeight: "bold" }}>
@@ -89,12 +90,16 @@ export default function App() {
             let name = temp2[0];
             let words = temp2[1];
             num += 1;
-            id = num.toString();
+            let id = num.toString();
+            for(let i=0; i<30; ++i){
             x.push({
               id,
               name,
               words
             });
+            num+=1;
+             id = num.toString();
+          }
           }
           setData(x);
         }
@@ -121,6 +126,8 @@ export default function App() {
         console.log("storing limit");
         if (!fromTop) storeData("harrypotter_start", (limit).toString());
         else setFromTop(false);
+        
+       
       }
     }
     return;
@@ -146,12 +153,16 @@ export default function App() {
     storeData("harrypotter_start", "5");
     setFromTop(true);
   }
+
+  const goToTop = () => (flatlist.scrollToOffset({offset:0, animated:true}))
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <FlatList
           data={data}
+          initialNumToRender={3}
           keyExtractor={item => item.id}
+          ref={ref => flatlist = ref}
           renderItem={Box}
         />
         <View>
@@ -160,6 +171,7 @@ export default function App() {
           <Button title="from start ?"
             onPress={restart}
             color={"red"} />
+            <Button title="top" onPress={goToTop}/>
         </View>
       </View>
     </SafeAreaView>
