@@ -26,7 +26,7 @@ export default function App() {
   const [limit, setLimit] = useState(null);
 
   //to make sure we dont sotre limit twice when from top is presssed
-  const [fromTop, setFromTop] = useState(false);
+  // const [fromTop, setFromTop] = useState(false);
   //color palette for text boxes
   // const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
@@ -114,8 +114,8 @@ export default function App() {
     finally {
       if (limit != null) {
         console.log("storing limit");
-        if (!fromTop) storeData("harrypotter_start", (limit).toString());
-        else setFromTop(false);
+       storeData("harrypotter_start", (limit).toString());
+        
       }
     }
     return;
@@ -129,8 +129,8 @@ export default function App() {
     db.collection("books").doc("harrypotter").get().then((doc) => {
       if (doc.exists && x.length == 0) {
         x = doc.data().a;
-        if (!fromTop) storeData("harrypotter", JSON.stringify(x));
-        else setFromTop(false);
+       storeData("harrypotter", JSON.stringify(x));
+        
       }
       //data might show empty as we are using async functions
       //else console.log("cant find books || local data -----> " + data);
@@ -145,7 +145,7 @@ export default function App() {
   //   goToTop();
   // }
 
-  const goToTop = () => (flatlist.scrollToOffset({ offset: 0, animated: true }))
+  const goToTop = () => {flatlist.scrollToOffset({ offset: 0, animated: true })}
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
