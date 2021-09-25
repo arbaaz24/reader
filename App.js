@@ -26,7 +26,7 @@ export default function App() {
   const [limit, setLimit] = useState(null);
 
   //to make sure we dont sotre limit twice when from top is presssed
-  // const [fromTop, setFromTop] = useState(false);
+  const [fromTop, setFromTop] = useState(false);
   //color palette for text boxes
   // const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
@@ -114,8 +114,8 @@ export default function App() {
     finally {
       if (limit != null) {
         console.log("storing limit");
-       storeData("harrypotter_start", (limit).toString());
-        
+        if (!fromTop) storeData("harrypotter_start", (limit).toString());
+        else setFromTop(false);
       }
     }
     return;
@@ -139,12 +139,11 @@ export default function App() {
     const storage = firebase.storage();
   }, []);
 
-  // const restart = () => {
-  //   storeData("harrypotter_start", "5");
-  //   setFromTop(true);
-  //   goToTop();
-  // }
-
+  const restart = () => {
+    storeData("harrypotter_start", "5");
+    setFromTop(true);
+    goToTop();
+  }
   const goToTop = () => {flatlist.scrollToOffset({ offset: 0, animated: true })}
 
   return (
@@ -160,10 +159,10 @@ export default function App() {
           ref={ref => flatlist = ref}
           renderItem={Box}
         />
-        <View style={{ justifyContent: "center", flexDirection: "row", padding: 10 }}>
+        <View style={{ justifyContent: "center", flexDirection: "row", padding: 30 }}>
           <Button title="Press x2"
             onPress={addData} />
-          <Button title="top" onPress={goToTop} />
+          <Button title="restart" onPress={restart} />
         </View>
       </View>
     </SafeAreaView>
