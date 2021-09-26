@@ -24,11 +24,8 @@ export default function App() {
   LogBox.ignoreLogs(['Setting a timer']);
   const [data, setData] = useState([]);
   const [limit, setLimit] = useState(null);
-
   //to make sure we dont sotre limit twice when from top is presssed
   const [fromTop, setFromTop] = useState(false);
-  //color palette for text boxes
-  // const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
   // for now we are using global variable
   let x = [];
   let flatlist;
@@ -38,24 +35,31 @@ export default function App() {
     const align = ["flex-start", "flex-end"];
     const margin = [7, 0];
     return (
-        <View style={{ padding: 4 }}>
-            {(parseInt(item.id) <= limit) ? //using ternary inside a ternary oprtr
-                <View style={{ alignSelf: align[parseInt(item.id) % 2], maxWidth: "90%", backgroundColor: colors[parseInt(item.id) % 8], borderRadius: 10, marginLeft: margin[parseInt(item.id) % 2], marginRight: margin[parseInt(item.id) % 2], padding: 10 }}>
-                    <Text style={{ fontWeight: "bold" }}>
-                        {item.name}
-                    </Text>
-                    <Text >
-                        {item.id}
-                        {item.words}
-                    </Text>
-                </View>
-                :
-                null
-            }
-        </View>
+      <View style={{ padding: 4 }}>
+        {(parseInt(item.id) <= limit) ? //using ternary inside a ternary oprtr
+          <View style={{
+            alignSelf: align[parseInt(item.id) % 2],
+            borderRadius: 10,
+            maxWidth: "90%",
+            padding: 10,
+            backgroundColor: colors[parseInt(item.id) % 8],
+            marginLeft: margin[parseInt(item.id) % 2],
+            marginRight: margin[parseInt(item.id) % 2],
+          }}>
+            <Text style={{ fontWeight: "bold" }}>
+              {item.name}
+            </Text>
+            <Text >
+              {item.id}
+              {item.words}
+            </Text>
+          </View>
+          :
+          null
+        }
+      </View>
     );
-};
-
+  };
   //key is the name of the doc in firestore
   const storeData = async (key, value) => {
     try {
@@ -99,7 +103,6 @@ export default function App() {
     }
 
   }
-
   const addData = async () => {
     console.log("in add Data");
 
@@ -120,7 +123,12 @@ export default function App() {
     }
     return;
   }
-
+  const restart = () => {
+    storeData("harrypotter_start", "0");
+    setFromTop(true);
+    goToTop();
+  }
+  const goToTop = () => { flatlist.scrollToOffset({ offset: 0, animated: true }) }
   useEffect(() => {
     // we can't use await inside non-async function(.getItem() still works), better call an async function from here
     console.log("************************ WORKING *************************");
@@ -129,8 +137,8 @@ export default function App() {
     db.collection("books").doc("harrypotter").get().then((doc) => {
       if (doc.exists && x.length == 0) {
         x = doc.data().a;
-       storeData("harrypotter", JSON.stringify(x));
-        
+        storeData("harrypotter", JSON.stringify(x));
+
       }
       //data might show empty as we are using async functions
       //else console.log("cant find books || local data -----> " + data);
@@ -138,14 +146,6 @@ export default function App() {
     //work in progress for cloud storage, accesible by both, google storage and firebase storage
     const storage = firebase.storage();
   }, []);
-
-  const restart = () => {
-    storeData("harrypotter_start", "5");
-    setFromTop(true);
-    goToTop();
-  }
-  const goToTop = () => {flatlist.scrollToOffset({ offset: 0, animated: true })}
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -159,7 +159,7 @@ export default function App() {
           ref={ref => flatlist = ref}
           renderItem={Box}
         />
-        <View style={{ justifyContent: "center", flexDirection: "row", padding: 30 }}>
+        <View style={{ justifyContent: "center", flexDirection: "row", padding: 5 }}>
           <Button title="Press x2"
             onPress={addData} />
           <Button title="restart" onPress={restart} />
