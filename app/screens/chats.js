@@ -60,6 +60,7 @@ export default chats = ({props}) => {
       console.log("in getData()");
       try {
         //getting data (in JSON) from  local storage
+        //can we use AsynStorage.getItem().then() ??
         value = await AsyncStorage.getItem(key);
         if (value !== null) {
           // value previously stored
@@ -110,11 +111,13 @@ export default chats = ({props}) => {
       return;
     }
     const restart = () => {
-      storeData("harrypotter_start", "0");
-      setFromTop(true);
-      goToTop();
+      storeData("harrypotter_start", "0")
+      setFromTop(true)
+      goToTop()
     }
+    
     const goToTop = () => { flatlist.scrollToOffset({ offset: 0, animated: true }) }
+
     useEffect(() => {
       // we can't use await inside non-async function(.getItem() still works), better call an async function from here
       console.log("************************ WORKING *************************");
@@ -131,7 +134,8 @@ export default chats = ({props}) => {
       });
       //work in progress for cloud storage, accesible by both, google storage and firebase storage
       const storage = firebase.storage();
-    }, []);
+    }, [])
+
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>

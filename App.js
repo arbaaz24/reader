@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, FlatList, LogBox, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {test_screen_1, test_screen_2} from "./app/screens";
 import Constants from 'expo-constants';
 import firebase from "@firebase/app";
 import "@firebase/storage";
@@ -20,19 +23,24 @@ if (!firebase.apps.length) {
   });
 }
 
-export default function App() {
+const Stack = createNativeStackNavigator();
+
+export default App = () => {
   LogBox.ignoreLogs(['Setting a timer']);
-  
+  console.log("working before useEffect")
   useEffect(() => {
     // we can't use await inside non-async function(.getItem() still works), better call an async function from here
     console.log("************************ WORKING *************************");
-   
+
   }, []);
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-       
-      </View>
+      <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="screen_2" component={test_screen_2} />
+        <Stack.Screen name="screen_1" component={test_screen_1} />
+      </Stack.Navigator>
+    </NavigationContainer>
     </SafeAreaView>
   );
 }
