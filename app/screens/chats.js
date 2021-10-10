@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, FlatList, LogBox, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Button, FlatList, LogBox, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from 'expo-constants';
 import firebase from "@firebase/app";
@@ -22,7 +22,7 @@ export default chats = ({ props }) => {
     const margin = [7, 0];
     return (
       <View style={{ padding: 4 }}>
-        {(parseInt(item.id) <= limit) ? 
+        {(parseInt(item.id) <= limit) ?
           <View style={{
             alignSelf: align[parseInt(item.id) % 2],
             borderRadius: 10,
@@ -32,10 +32,10 @@ export default chats = ({ props }) => {
             marginLeft: margin[parseInt(item.id) % 2],
             marginRight: margin[parseInt(item.id) % 2],
           }}>
-            <Text style={{ fontWeight: "bold",color: '#191970' }}>
+            <Text style={{ fontWeight: "bold", color: '#191970' }}>
               {item.name}
             </Text>
-            <Text style = {{}}>
+            <Text style={{}}>
               {item.id}
               {item.words}
             </Text>
@@ -92,7 +92,6 @@ export default chats = ({ props }) => {
   }
   const addData = async () => {
     console.log("in add Data");
-
     try {
       let n = await AsyncStorage.getItem("harrypotter_start");
       if (n != null) setLimit(parseInt(n) + 5);
@@ -124,7 +123,7 @@ export default chats = ({ props }) => {
     const db = firebase.firestore();
     getData("harrypotter");
     db.collection("books").doc("harrypotter").get().then((doc) => {
-      //here, x.length!=0 means always read data, x.lenght==0 means dont read data
+      //here, x.length!=0 means always read data, x.lenght==0 means dont read data as it already exists in persitent storage
       if (doc.exists && x.length != 0) {
         x = doc.data().a;
         storeData("harrypotter", JSON.stringify(x));
@@ -150,10 +149,23 @@ export default chats = ({ props }) => {
           ref={ref => flatlist = ref}
           renderItem={Box}
         />
-        <View style={{ justifyContent: "center", flexDirection: "row", padding: 5 }}>
-          <Button title="Press x2"
-            onPress={addData} />
-          <Button title="restart" onPress={restart} />
+        <View style={{   padding:0,
+        justifyContent: "center",
+         flexDirection: "row",}}>
+          <Pressable
+            onPressIn={addData}
+            onPressOut={addData}
+            style={{ borderRadius:20, height: 40, width: 40, backgroundColor: "green" }}>
+          </Pressable>
+          <Pressable onPressIn={goToTop}>
+            <Text>Go to top</Text>        
+          </Pressable>
+          {/*need to remove under button in production*/}
+          <Pressable
+            onPressIn={restart}
+            onPressOut={addData}
+            style={{ borderRadius:20, height: 40, width: 40, backgroundColor: "red" }}>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
@@ -164,6 +176,6 @@ const styles = StyleSheet.create({
     backgroundColor: `#fffaf0`,
     flex: 1,
     justifyContent: 'center',
-    //marginTop: Platform.OS === "android" ? 40 : 0,
+    marginTop: Platform.OS === "android" ? 40 : 0,
   },
 });
