@@ -27,7 +27,6 @@ const Stack = createNativeStackNavigator();
 
 export default App = () => {
   LogBox.ignoreLogs(['Setting a timer']);
-  console.log("working before useEffect")
   useEffect(() => {
     // we can't use await inside non-async function(.getItem() still works), better call an async function from here
     console.log("************************ WORKING *************************");
@@ -44,8 +43,8 @@ export default App = () => {
           
           }}
         >
-          <Stack.Screen name="chats" component={chats} />
           <Stack.Screen name="screen_2" component={test_screen_2}/>
+          <Stack.Screen name="chats" component={chats} />
           <Stack.Screen name="screen_1" component={test_screen_1} />
         </Stack.Navigator>
       </NavigationContainer>
