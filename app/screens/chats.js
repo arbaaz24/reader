@@ -1,23 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Button, FlatList, LogBox, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from 'expo-constants';
+// import Constants from 'expo-constants';
 import firebase from "@firebase/app";
 import "@firebase/storage";
 import "@firebase/firestore";
 
-export default chats = ({ props }) => {
-  LogBox.ignoreLogs(['Setting a timer']);
-  const [data, setData] = useState([]);
+export default chats = ({ props, route }) => {
+  const { screenName } = route.params
+  const screenStart = screenName + "_start"
+  const [data, setData] = useState("");
   const [limit, setLimit] = useState(null);
   //to make sure we dont sotre limit twice when from top is presssed
   const [fromTop, setFromTop] = useState(false);
   // for now we are using global variable
-  let x = [];
-  let flatlist;
+  let x = []
+  let mainString = ""
+  let flatlist
   //we can write {item} here and HAVE TO use item.attr_name inside 
   const Box = ({ item }) => {
-    const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#e6e6fa`, `#f0ffff`, `#87cefa`];
+    const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`,`#ff0000`];
     const align = ["flex-start", "flex-end"];
     const margin = [7, 0];
     return (
@@ -27,16 +29,16 @@ export default chats = ({ props }) => {
             alignSelf: align[parseInt(item.id) % 2],
             borderRadius: 10,
             maxWidth: "90%",
-            padding: 10,
-            backgroundColor: colors[parseInt(item.id) % 8],
+            padding: 8,
+            backgroundColor: "white",
             marginLeft: margin[parseInt(item.id) % 2],
             marginRight: margin[parseInt(item.id) % 2],
           }}>
-            <Text style={{ fontWeight: "bold", color: '#191970' }}>
+            <Text style={{ fontWeight: "bold",  color: colors[parseInt(item.id) % 8] }}>
               {item.name}
             </Text>
             <Text style={{}}>
-              {item.id}
+              {/* {item.id} */}
               {item.words}
             </Text>
           </View>
@@ -49,41 +51,39 @@ export default chats = ({ props }) => {
   //key is the name of the doc in firestore
   const storeData = async (key, value) => {
     try {
-      await AsyncStorage.setItem(key, value);
-      console.log("data stored successfully\n");
+      await AsyncStorage.setItem(key, value)
+      console.log("data stored successfully\n")
     } catch (e) {
-      console.log("error storing data" + e);
+      console.log("error storing data" + e)
     }
   }
   const getData = async (key) => {
-    let value = [];
-    console.log("in getData()");
+    let value
+    console.log("in getData()")
     try {
       //getting data (in JSON) from  local storage
       //can we use AsynStorage.getItem().then() ??
-      value = await AsyncStorage.getItem(key);
+      value = await AsyncStorage.getItem(key)
       if (value !== null) {
         // value previously stored
-        //console.log(JSON.parse(value));
-        let num = 0;
-        for (let str of JSON.parse(value)) {
+        // console.log(value);
+        let num = 0
           //= is our delimiter
-          let temp = str.split("=");
+          let temp = value.split("=")
           for (let str of temp) {
-            let temp2 = str.split(":");
-            let name = temp2[0];
-            let words = temp2[1];
-            num += 1;
-            let id = num.toString();
+            let temp2 = str.split(":")
+            let name = temp2[0]
+            let words = temp2[1]
+            let id = num.toString()
+            num += 1
             x.push({
               id,
               name,
               words
             });
-          }
           setData(x);
         }
-        //console.log("x looks like this ", x);
+        // console.log("x looks like this ", x);
       }
     } catch (e) {
       console.log("No data in local storage " + e);
@@ -93,7 +93,7 @@ export default chats = ({ props }) => {
   const addData = async () => {
     console.log("in add Data");
     try {
-      let n = await AsyncStorage.getItem("harrypotter_start");
+      let n = await AsyncStorage.getItem(screenStart);
       if (n != null) setLimit(parseInt(n) + 5);
       console.log("limit -> " + limit);
     }
@@ -102,45 +102,44 @@ export default chats = ({ props }) => {
     }
     finally {
       if (limit != null) {
-        console.log("storing limit");
-        if (!fromTop) storeData("harrypotter_start", (limit).toString());
+        if (!fromTop) storeData(screenStart, (limit).toString());
         else setFromTop(false);
       }
     }
     return;
   }
   const restart = () => {
-    storeData("harrypotter_start", "0")
+    storeData(screenStart, "0")
     setFromTop(true)
     goToTop()
   }
 
   const goToTop = () => { flatlist.scrollToOffset({ offset: 0, animated: true }) }
 
-  useEffect(() => {
-    // we can't use await inside non-async function(.getItem() still works), better call an async function from here
-    console.log("************************ WORKING *************************");
+  const downloadData = async () => {
     const db = firebase.firestore();
-    getData("harrypotter");
-    db.collection("books").doc("harrypotter").get().then((doc) => {
-      //here, x.length!=0 means always read data, x.lenght==0 means dont read data as it already exists in persitent storage
-      if (doc.exists && x.length != 0) {
-        x = doc.data().a;
-        storeData("harrypotter", JSON.stringify(x));
+    db.collection("movies").doc(screenName).get().then((doc) => {
+      //here, change mainString.length !=0 to download again, else it downloads only once
+      if (doc.exists && mainString.length == 0) {
+        mainString = doc.data().a
+        storeData(screenName, mainString)
 
       }
       //data might show empty as we are using async functions
-      //else console.log("cant find books || local data -----> " + data);
+      else console.log("cant find books || local data -----> " + data);
     });
-    //work in progress for cloud storage, accesible by both, google storage and firebase storage
-    const storage = firebase.storage();
+  }
+  useEffect(() => {
+    console.log("************************ WORKING *************************");
+    getData(screenName)
+    downloadData()
   }, [])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={{ alignSelf: "center", backgroundColor: "yellow", fontWeight: "bold", fontSize: 20 }}>
-          Harry Potter and the sorcerer's stone
+          {screenStart}
         </Text>
         <FlatList
           data={data}
@@ -149,22 +148,24 @@ export default chats = ({ props }) => {
           ref={ref => flatlist = ref}
           renderItem={Box}
         />
-        <View style={{   padding:0,
-        justifyContent: "center",
-         flexDirection: "row",}}>
+        <View style={{
+          padding: 0,
+          justifyContent: "center",
+          flexDirection: "row",
+        }}>
           <Pressable
             onPressIn={addData}
             onPressOut={addData}
-            style={{ borderRadius:20, height: 40, width: 40, backgroundColor: "green" }}>
+            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "green" }}>
           </Pressable>
           <Pressable onPressIn={goToTop}>
-            <Text>Go to top</Text>        
+            <Text>Go to top</Text>
           </Pressable>
-          {/*need to remove under button in production*/}
+          {/*need to remove under button when in production*/}
           <Pressable
             onPressIn={restart}
             onPressOut={addData}
-            style={{ borderRadius:20, height: 40, width: 40, backgroundColor: "red" }}>
+            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }}>
           </Pressable>
         </View>
       </View>

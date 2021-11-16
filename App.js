@@ -43,9 +43,9 @@ export default App = () => {
           
           }}
         >
-          <Stack.Screen name="screen_2" component={test_screen_2}/>
+          {/* <Stack.Screen name="login" component={test_screen_1} /> */}
+          <Stack.Screen name="store" component={test_screen_2}/>
           <Stack.Screen name="chats" component={chats} />
-          <Stack.Screen name="screen_1" component={test_screen_1} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

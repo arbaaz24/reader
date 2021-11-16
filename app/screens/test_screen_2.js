@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Pressable, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import "@firebase/storage";
 //maybe i have to intls. maybe not(since we intls. in App.js), not usure
 import firebase from "@firebase/app";
 
 export default test_screen_2 = ({ navigation, route }) => {
     const storage = firebase.storage()
-    const [links, setLinks] = useState([])
-    //this array is used to config links
+    const [movieLinks, setMovieLinks] = useState([])
+    const [bookLinks, setBookLinks] = useState([])
+    //these arrays are used to config links
     let temp = []
+    let temp2 = []
     const getImages = async () => {
+        let reference =['movies', 'books']
+        for(let k=0;k<2;k+=1){
         let i = 0
-        storage.ref('movies').list()
+        storage.ref(reference[k]).list()
             .then(res => {
                 res.items.forEach(i => i.getDownloadURL()
                     .then(res => {
@@ -19,22 +23,21 @@ export default test_screen_2 = ({ navigation, route }) => {
                         // console.log(res)
                         let id = i.toString()
                         i += 1
-                        temp.push({ id, link })
+                        if(k==0) temp.push({ id, link })
+                        else temp2.push({ id, link })
                         // setImages()
-                        setLinks(temp)
+                        if(k==0) setMovieLinks(temp)
+                        else setBookLinks(temp2)
                     }
                     )
                 )
 
             }
             )
-            .catch(e => console.log(e));
+            .catch(e => console.log(e))
+        }
     }
-    // const setImages = async () => {
-    //     if (temp.length > 0) {
-    //         setLinks(temp)
-    //     }
-    // }
+
     useEffect(() => {
         getImages()
     }, [])
@@ -50,7 +53,7 @@ export default test_screen_2 = ({ navigation, route }) => {
     const pic = ({ item }) => {
         let url = item.link
         return (
-            <Pressable
+            <Pressable 
                 onPress={() => goToChat({item})}> 
                 <Image
                     style={styles.img}
@@ -64,19 +67,26 @@ export default test_screen_2 = ({ navigation, route }) => {
     }
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{ backgroundColor: "blue", flexDirection: "row" }}>
+            <ScrollView>
+                <Text style={{fontWeight: "bold", fontSize: 20, color:"white"}}>
+                    Movies
+                </Text>
                 <FlatList
                     horizontal={true}
-                    data={links}
+                    data={movieLinks}
                     keyExtractor={item => item.id}
                     renderItem={pic}
                 />
-            </View>
-            <View style={{ flex: 8, backgroundColor: "green", justifyContent: 'center', alignItems: "center", }} >
-                <Text>
-                    Testing area
+                <Text style={{fontWeight: "bold", fontSize: 20, color:"white", marginTop:10}}>
+                    Books ( only not boring )
                 </Text>
-            </View>
+                <FlatList style={{}}
+                    horizontal={true}
+                    data={bookLinks}
+                    keyExtractor={item => item.id}
+                    renderItem={pic}
+                />
+            </ScrollView>
         </SafeAreaView>
     )
 }
@@ -84,19 +94,16 @@ export default test_screen_2 = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
-        backgroundColor: `#fffdc3`,
+        backgroundColor: "black",
         flex: 1,
         justifyContent: 'center',
         marginTop: Platform.OS === "android" ? 40 : 0,
+        padding:5,
 
     },
     img: {
-        width: 150,
-        height: 210,
-    },
-    pressed: {
-        backgroundColor: `black`,
-        borderRadius: 8,
-        padding: 6
+        borderRadius: 25,
+        height: 190,
+        width: 145,
     }
 });
