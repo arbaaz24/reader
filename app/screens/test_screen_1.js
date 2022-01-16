@@ -1,21 +1,19 @@
 import React  from "react";
-import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {  SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 export default test_screen_1 = ({navigation}) => {
 return (
-    <SafeAreaView style={styles.container}>
-        <Text>
-            Screen 1
-        </Text>
-        <Button 
-            title="go to store"
-            //use the name prop for navigation
-            onPress={()=>navigation.navigate('store', {
-                name: "Syed Arbaaz Khurram",
-                rollno: 83
-            })}
-        />
-    </SafeAreaView>
+   <SafeAreaView style={{ flex: 1 }}>
+       <Tab.Navigator>
+       <Tab.Screen name="store" component={test_screen_2}/>
+       <Tab.Screen name="subscribed" component={subscribed}/>
+       <Tab.Screen name="my account" component={myaccount} />
+       </Tab.Navigator>
+   </SafeAreaView>
 )
 }
 

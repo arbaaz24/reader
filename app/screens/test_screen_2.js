@@ -78,7 +78,7 @@ export default test_screen_2 = ({ navigation, route }) => {
                     renderItem={pic}
                 />
                 <Text style={{fontWeight: "bold", fontSize: 20, color:"white", marginTop:10}}>
-                    Books ( only not boring )
+                    Books
                 </Text>
                 <FlatList style={{}}
                     horizontal={true}

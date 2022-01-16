@@ -5,8 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import firebase from "@firebase/app";
 import "@firebase/storage";
 import "@firebase/firestore";
-
-export default chats = ({ props, route }) => {
+import Box from "../components/Box.js"
+export default chats = ({ navigation, props, route }) => {
   const { screenName } = route.params
   const screenStart = screenName + "_start"
   const [data, setData] = useState("");
@@ -18,41 +18,42 @@ export default chats = ({ props, route }) => {
   let mainString = ""
   let flatlist
   //we can write {item} here and HAVE TO use item.attr_name inside 
-  const Box = ({ item }) => {
-    const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`,`#ff0000`];
-    const align = ["flex-start", "flex-end"];
-    const margin = [7, 0];
-    return (
-      <View style={{ padding: 4 }}>
-        {(parseInt(item.id) <= limit) ?
-          <View style={{
-            alignSelf: align[parseInt(item.id) % 2],
-            borderRadius: 10,
-            maxWidth: "90%",
-            padding: 8,
-            backgroundColor: "white",
-            marginLeft: margin[parseInt(item.id) % 2],
-            marginRight: margin[parseInt(item.id) % 2],
-          }}>
-            <Text style={{ fontWeight: "bold",  color: colors[parseInt(item.id) % 8] }}>
-              {item.name}
-            </Text>
-            <Text style={{}}>
-              {/* {item.id} */}
-              {item.words}
-            </Text>
-          </View>
-          :
-          null
-        }
-      </View>
-    );
-  };
+  //--------box is here --------------
+  // const Box = ({ item }) => {
+  //   const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`,`#ff0000`];
+  //   const align = ["flex-start", "flex-end"];
+  //   const margin = [7, 0];
+  //   return (
+  //     <View style={{ padding: 4 }}>
+  //       {(parseInt(item.id) <= limit) ?
+  //         <View style={{
+  //           alignSelf: align[parseInt(item.id) % 2],
+  //           borderRadius: 10,
+  //           maxWidth: "90%",
+  //           padding: 8,
+  //           backgroundColor: "white",
+  //           marginLeft: margin[parseInt(item.id) % 2],
+  //           marginRight: margin[parseInt(item.id) % 2],
+  //         }}>
+  //           <Text style={{ fontWeight: "bold",  color: colors[parseInt(item.id) % 8] }}>
+  //             {item.name}
+  //           </Text>
+  //           <Text style={{}}>
+  //             {/* {item.id} */}
+  //             {item.words}
+  //           </Text>
+  //         </View>
+  //         :
+  //         null
+  //       }
+  //     </View>
+  //   )
+  // }
   //key is the name of the doc in firestore
-  const storeData = async (key, value) => {
+  const storeData = async (key, value, location) => {
     try {
       await AsyncStorage.setItem(key, value)
-      console.log("data stored successfully\n")
+      console.log("data stored successfully from function " + location +"\n")
     } catch (e) {
       console.log("error storing data" + e)
     }
@@ -69,7 +70,7 @@ export default chats = ({ props, route }) => {
         // console.log(value);
         let num = 0
           //= is our delimiter
-          let temp = value.split("=")
+          let temp = value.split('^')
           for (let str of temp) {
             let temp2 = str.split(":")
             let name = temp2[0]
@@ -85,9 +86,14 @@ export default chats = ({ props, route }) => {
         }
         // console.log("x looks like this ", x);
       }
+      else{//here downloadData() because we want to download only if not available locally
+        downloadData()
+      } 
     } catch (e) {
       console.log("No data in local storage " + e);
-    }
+    }// finally{
+    //   x=[]
+    // }
 
   }
   const addData = async () => {
@@ -102,14 +108,14 @@ export default chats = ({ props, route }) => {
     }
     finally {
       if (limit != null) {
-        if (!fromTop) storeData(screenStart, (limit).toString());
+        if (!fromTop) storeData(screenStart, (limit).toString(), "addData()");
         else setFromTop(false);
       }
     }
     return;
   }
   const restart = () => {
-    storeData(screenStart, "0")
+    storeData(screenStart, "0", "restart()")
     setFromTop(true)
     goToTop()
   }
@@ -117,12 +123,14 @@ export default chats = ({ props, route }) => {
   const goToTop = () => { flatlist.scrollToOffset({ offset: 0, animated: true }) }
 
   const downloadData = async () => {
+    console.log("in downloadData()\n")
     const db = firebase.firestore();
     db.collection("movies").doc(screenName).get().then((doc) => {
       //here, change mainString.length !=0 to download again, else it downloads only once
       if (doc.exists && mainString.length == 0) {
         mainString = doc.data().a
-        storeData(screenName, mainString)
+        storeData(screenName, mainString, "downloadData()")
+        getData(screenName)
 
       }
       //data might show empty as we are using async functions
@@ -132,9 +140,15 @@ export default chats = ({ props, route }) => {
   useEffect(() => {
     console.log("************************ WORKING *************************");
     getData(screenName)
-    downloadData()
+    //line under should be removed in production
+    //downloadData()
   }, [])
 
+  const render =({item})=>{
+    return(
+      <Box limit={limit} item={item} />
+    )
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -146,7 +160,7 @@ export default chats = ({ props, route }) => {
           initialNumToRender={3}
           keyExtractor={item => item.id}
           ref={ref => flatlist = ref}
-          renderItem={Box}
+          renderItem={render}
         />
         <View style={{
           padding: 0,
@@ -156,17 +170,19 @@ export default chats = ({ props, route }) => {
           <Pressable
             onPressIn={addData}
             onPressOut={addData}
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "green" }}>
-          </Pressable>
-          <Pressable onPressIn={goToTop}>
+            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "green" }}/>
+      
+          <Pressable onPressIn={goToTop}
+          style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "orange" }}>
             <Text>Go to top</Text>
           </Pressable>
           {/*need to remove under button when in production*/}
           <Pressable
             onPressIn={restart}
             onPressOut={addData}
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }}>
-          </Pressable>
+            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }} />
+          
+          
         </View>
       </View>
     </SafeAreaView>
