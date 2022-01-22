@@ -1,54 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from 'react-native-vector-icons/Ionicons';
+import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
+
 // import Constants from 'expo-constants';
 import firebase from "@firebase/app";
 import "@firebase/storage";
 import "@firebase/firestore";
 import Box from "../components/Box.js"
 export default chats = ({ navigation, props, route }) => {
+  //prevents screen shots
+ 
   const { screenName } = route.params
   const screenStart = screenName + "_start"
-  const [data, setData] = useState("");
-  const [limit, setLimit] = useState(null);
+  const [data, setData] = useState("")
+  const [limit, setLimit] = useState(null)
   //to make sure we dont sotre limit twice when from top is presssed
   const [fromTop, setFromTop] = useState(false);
   // for now we are using global variable
   let x = []
   let mainString = ""
   let flatlist
-  //we can write {item} here and HAVE TO use item.attr_name inside 
-  //--------box is here --------------
-  // const Box = ({ item }) => {
-  //   const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`,`#ff0000`];
-  //   const align = ["flex-start", "flex-end"];
-  //   const margin = [7, 0];
-  //   return (
-  //     <View style={{ padding: 4 }}>
-  //       {(parseInt(item.id) <= limit) ?
-  //         <View style={{
-  //           alignSelf: align[parseInt(item.id) % 2],
-  //           borderRadius: 10,
-  //           maxWidth: "90%",
-  //           padding: 8,
-  //           backgroundColor: "white",
-  //           marginLeft: margin[parseInt(item.id) % 2],
-  //           marginRight: margin[parseInt(item.id) % 2],
-  //         }}>
-  //           <Text style={{ fontWeight: "bold",  color: colors[parseInt(item.id) % 8] }}>
-  //             {item.name}
-  //           </Text>
-  //           <Text style={{}}>
-  //             {/* {item.id} */}
-  //             {item.words}
-  //           </Text>
-  //         </View>
-  //         :
-  //         null
-  //       }
-  //     </View>
-  //   )
-  // }
+  
+
   //key is the name of the doc in firestore
   const storeData = async (key, value, location) => {
     try {
@@ -72,7 +47,7 @@ export default chats = ({ navigation, props, route }) => {
           //= is our delimiter
           let temp = value.split('^')
           for (let str of temp) {
-            let temp2 = str.split(":")
+            let temp2 = str.split(">")
             let name = temp2[0]
             let words = temp2[1]
             let id = num.toString()
@@ -117,10 +92,12 @@ export default chats = ({ navigation, props, route }) => {
   const restart = () => {
     storeData(screenStart, "0", "restart()")
     setFromTop(true)
+    
     goToTop()
   }
 
   const goToTop = () => { flatlist.scrollToOffset({ offset: 0, animated: true }) }
+  
 
   const downloadData = async () => {
     console.log("in downloadData()\n")
@@ -149,6 +126,11 @@ export default chats = ({ navigation, props, route }) => {
       <Box limit={limit} item={item} />
     )
   }
+
+  const removeData = () =>{
+    AsyncStorage.removeItem(screenName)
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -157,7 +139,6 @@ export default chats = ({ navigation, props, route }) => {
         </Text>
         <FlatList
           data={data}
-          initialNumToRender={3}
           keyExtractor={item => item.id}
           ref={ref => flatlist = ref}
           renderItem={render}
@@ -170,19 +151,27 @@ export default chats = ({ navigation, props, route }) => {
           <Pressable
             onPressIn={addData}
             onPressOut={addData}
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "green" }}/>
+            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "green" }}>
+      <Icon name="arrow-down" size={30} style={{alignSelf:"center"}}  />
+      </Pressable>
       
           <Pressable onPressIn={goToTop}
           style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "orange" }}>
-            <Text>Go to top</Text>
+            <Icon name="arrow-up" size={30} style={{alignSelf:"center"}}  />
           </Pressable>
           {/*need to remove under button when in production*/}
           <Pressable
             onPressIn={restart}
             onPressOut={addData}
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }} />
-          
-          
+            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }} >
+              <IconMaterial name="delete" size={30} style={{alignSelf:"center"}}  />
+              </Pressable>
+          <Pressable
+            onPressIn={removeData}
+            onPressOut={removeData}
+            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "blue" }} >
+              <Icon name="md-refresh-sharp" size={30} style={{alignSelf:"center"}}  />
+              </Pressable>
         </View>
       </View>
     </SafeAreaView>

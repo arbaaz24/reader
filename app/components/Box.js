@@ -1,4 +1,5 @@
 import React from "react";
+
 import {Image, StyleSheet, Text, View} from "react-native";
    const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`,`#ff0000`]
    const align = ["flex-start", "flex-end"]
@@ -20,15 +21,15 @@ export default Box = ({ item, limit }) => {
             <Text style={{ fontWeight: "bold",  color: colors[parseInt(item.id) % 8] }}>
               {item.name}
             </Text>
-            <Text style={{}}>
+            <Text>
               {/* {item.id} */}
               {item.words}
             </Text>
           </View>
           :
-          <Image style={{height:50, width:50}} 
+          <Image style={styles.img} 
             source={{
-                uri: "https:" + item.words,
+                uri: item.words,
             }}/>
           :
           null
@@ -38,7 +39,9 @@ export default Box = ({ item, limit }) => {
 }
 
 const styles = StyleSheet.create({
-    container:{
-
+    img:{
+      height:50, 
+      width:50, 
+      alignSelf:"center"
     }
 })
