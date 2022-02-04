@@ -15,7 +15,7 @@
     "expo": "~42.0.1",
     "expo-screen-capture": "^4.1.0",
     "expo-status-bar": "~1.0.4",
-    "firebase": "^8.10.0",
+    "firebase": "^9.6.4",
     "firebase-admin": "^10.0.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
