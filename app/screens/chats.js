@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Alert, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Icon from 'react-native-vector-icons/Ionicons'
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons'
 import { initializeApp } from "firebase/app"
 import Box from "../components/Box.js"
-import { getFirestore, getDoc, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore'
+import { getFirestore, getDoc, doc } from 'firebase/firestore'
 import { firebaseConfig } from "../components/firebaseConfig"
 
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
 export default chats = ({ navigation, route }) => {
-  const { screenName, url, user } = route.params //url is the GCloud storage url for clicked image
+  const { screenName, uid } = route.params //url is the GCloud storage url for clicked image
   const screenStart = screenName + "_start"
   const [data, setData] = useState("")
   const [limit, setLimit] = useState(null)
@@ -31,9 +31,7 @@ export default chats = ({ navigation, route }) => {
     try {
       //getting data (in JSON) from  local storage
       value = await AsyncStorage.getItem(key)
-      if (value !== null) {
-        // value previously stored
-        // console.log(value);
+      if (value !== null) { 
         let num = 0
         //^ is our delimiter
         let temp = value.split('^')
@@ -69,19 +67,16 @@ export default chats = ({ navigation, route }) => {
     }
   }
 
-  const addData = async () => {
-    console.log("in addData()");
-
+  const increaseLimit = async () => {
+    console.log("in increaseLimit()")
       let n = await AsyncStorage.getItem(screenStart);
       if (n != null) {
-      setLimit(parseInt(n) + 5)
-      if (!fromTop) storeData(screenStart, (limit === null ? "5" :(limit).toString()), "addData()");
-      else setFromTop(false);
-    }
-    else storeData(screenStart, "0", "restart()")
+        setLimit(parseInt(n) + 5)
+        if (!fromTop) storeData(screenStart, (limit === null ? n :(limit).toString()), "increaseLimit()");
+        else setFromTop(false)
+      }
+      else storeData(screenStart, "0", "increaseLimit() and has been reset")
     console.log("limit -> " + limit);
-    
-    return;
   }
 
   const restart = async () => {
@@ -98,7 +93,7 @@ export default chats = ({ navigation, route }) => {
     const snap = await getDoc(doc(db, "movies", screenName))
     //here, change mainString.length !=0 to download again, else it downloads only once
     if (snap.exists() && mainString.length == 0) {
-      mainString = snap.data().a
+      mainString = snap.get("a")
       storeData(screenName, mainString, "downloadData()")
       getData(screenName)
     }
@@ -107,7 +102,7 @@ export default chats = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-    console.log("in chats > useEffects and user.uid -> ", user.uid, "screen path is ->", route.params.path)
+    console.log("in chats > useEffects")
     getData(screenName)
     
   }, [])
@@ -118,24 +113,22 @@ export default chats = ({ navigation, route }) => {
     )
   }
 
-  const removeData = async () => {
-    await AsyncStorage.removeItem(screenName)
-  }
+  const removeData = async () => await AsyncStorage.removeItem(screenName)
+  
 
   const subscribe = async () => {
-    console.log("in subscribe() and user.uid -->", user.uid)
-    updateDoc(doc(db, 'users', user.uid), { subscriptions: arrayUnion(url) })
+    console.log("in chats > subscribe() and uid -->", uid)
     setSubscribed(true)
-    let links = await AsyncStorage.getItem("subscribed" + user.uid)
+    let links = await AsyncStorage.getItem("subscribed" + uid)
     if (links === null) {
-      await AsyncStorage.setItem("subscribed" + user.uid, JSON.stringify([url]))
+      await AsyncStorage.setItem("subscribed" + uid, JSON.stringify([url]))
     }
     else {
       let links2 = JSON.parse(links)
       //before pushing we have to make sure that the url dosen't already exist, includes("arg here is case sensitive")
-      if(links2.includes(url)) alert("Already subscribed")
+      if(links2.includes(url)) Alert.alert("Already subscribed")
       else links2.push(url)
-      await AsyncStorage.setItem("subscribed" + user.uid, JSON.stringify(links2))
+      await AsyncStorage.setItem("subscribed" + uid, JSON.stringify(links2))
     }
   }
 
@@ -161,8 +154,8 @@ export default chats = ({ navigation, route }) => {
           flexDirection: "row",
         }}>
           <Pressable
-            onPressIn={addData}
-            onPressOut={addData}
+            onPressIn={increaseLimit}
+            onPressOut={increaseLimit}
             style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "green" }}>
             <Icon name="arrow-down" size={30} style={{ alignSelf: "center" }} />
           </Pressable>
@@ -171,16 +164,18 @@ export default chats = ({ navigation, route }) => {
             style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "orange" }}>
             <Icon name="arrow-up" size={30} style={{ alignSelf: "center" }} />
           </Pressable>
+
           {/*need to remove under button when in production*/}
           <Pressable
             onPressIn={restart}
-            onPressOut={addData}
+            onPressOut={increaseLimit}
             style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }} >
             <IconMaterial name="delete" size={30} style={{ alignSelf: "center" }} />
           </Pressable>
+
           <Pressable
             onPressIn={removeData}
-            onPressOut={removeData}
+            onPressOut={removeData}//maybe i can remove this extra press
             style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "blue" }} >
             <Icon name="md-refresh-sharp" size={30} style={{ alignSelf: "center" }} />
           </Pressable>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Image, Pressable, ScrollView, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Image, Pressable, ScrollView, SafeAreaView, StyleSheet, Text, View, Alert } from 'react-native'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { initializeApp } from "firebase/app"
 import { getFirestore, getDoc, doc } from 'firebase/firestore'
@@ -13,40 +13,28 @@ const auth = getAuth(app)
 
 export default subscribed = ({ navigation, route }) => {
   const [links, setLinks] = useState([])
-  const {user} = route.params
+  const {uid} = route.params
 
   useEffect(() => {
-    console.log("in subscribed > useEffect() and user.uid ->", user.uid)
+    console.log("in subscribed > useEffect() and uid ->", uid)
     getImages()
   }, [])
 
   const getImages = async () => {
     console.log("in subscribed > getImages()")
     try {
-      let temp0 = await AsyncStorage.getItem("subscribed" + user.uid)
+      let temp0 = await AsyncStorage.getItem("subscribed" + uid)
       if (temp0 !== null) {
         let temp2 = JSON.parse(temp0)
         let temp3 = []
         let index = 0
-        temp2.forEach(l => {
-          temp3.push({ id: index.toString(), link: l })
+        temp2.forEach(url => {
+          temp3.push({ id: index.toString(), link: url })
           index += 1
         })
         setLinks(temp3)
       }
-      else {
-        const snap = await getDoc(doc(db, 'users', user.uid))
-        if (snap.exists()) {
-          let temp = snap.data().subscriptions
-          let temp2 = []
-          let index = 0
-          temp.forEach(l => {
-            temp2.push({ id: index.toString(), link: l })
-            index += 1
-          })
-          setLinks(temp2)
-        }
-      }
+      else Alert.alert("You have no subscriptions...on this device")
     }
     catch (e) {
       console.log(e)
@@ -60,14 +48,27 @@ export default subscribed = ({ navigation, route }) => {
     // console.log(t)
     let t2 = t[1].split(".")
     let screenName = t2[0]
-    navigation.navigate("chats", { screenName, url: item.link })
+    navigation.navigate("chats", { screenName, url: item.link})
+  }
+
+  const unsubscribe = async (url) => {
+    const temp = await AsyncStorage.getItem("subscribed"+uid)
+    if(temp !== null){
+      let temp2 = JSON.parse(temp)
+      //removing this url 
+      temp2.splice(temp2.indexOf(url), 1)
+      await AsyncStorage.setItem("subscribed"+uid, JSON.stringify(temp2))
+      Alert.alert("Unsubscribed")
+    }
+    else console.log("cant find subscribed+uid")
   }
 
   const pic = ({ item }) => {
     let url = item.link
     return (
       <Pressable
-        onPress={() => goToChat({ item })}>
+        onPress={() => goToChat({ item })}
+        onLongPress={() => unsubscribe(url) }>
         <Image
           style={styles.img}
           source={{
@@ -82,7 +83,7 @@ export default subscribed = ({ navigation, route }) => {
   const goStore = () => navigation.navigate("store")
   const goSubscribed = () => navigation.navigate("subscribed")
   const goMyAccount = () => navigation.navigate("myaccount")
-  const clearAll = async () => await AsyncStorage.removeItem("subscribed" + user.uid)
+  const clearAll = async () => await AsyncStorage.removeItem("subscribed" + uid)
 
   return (
     <SafeAreaView style={styles.container}>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons'
 import { initializeApp } from 'firebase/app'
 import { getAuth, signOut } from "firebase/auth"
@@ -10,15 +10,15 @@ const app = initializeApp(firebaseConfig)
 
 export default myaccount = ({ navigation, route }) => {
     const auth = getAuth(app)
-    const {user} = route.params
+    const {uid} = route.params
     const logOut = async () => {
         await signOut(auth)
-        alert("Please close the app to fully log out..")
+        Alert.alert("Please close the app to fully log out..")
 
     }
 
     useEffect(() => {
-        console.log("in myaccount > useEffect and user.uid ->", user.uid)
+        console.log("in myaccount > useEffect and uid ->", uid)
     },[])
 
     const goStore = () => navigation.navigate("store")

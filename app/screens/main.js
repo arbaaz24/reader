@@ -1,30 +1,51 @@
-import React from "react";
-import {  SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, { useState, useEffect } from "react"
+import { SafeAreaView, StyleSheet, Text, View, FlatList, Pressable } from "react-native"
+import { doc, getFirestore, collection, getDocs, query, getDoc, setDoc } from "firebase/firestore"
+import { firebaseConfig } from "../components/firebaseConfig"
+import { initializeApp } from "firebase/app"
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+export default main = ({ navigation, route }) => {
+  const { topic } = route.params
+  const [data, setData] = useState([])
+  let temp = []
+  const app = initializeApp(firebaseConfig)
+  const db = getFirestore(app)
 
-export default main = ({navigation, route}) => {
+  const getChats = async () => {
+    let snap = await getDoc(doc(db, topic, "all"))
+    setData(snap.get("a"))
+  }
 
-return (
-   <SafeAreaView style={styles.container}>
-       <Tab.Navigator screenOptions={{ headerShown: false,cardShadowEnabled:true, gestureEnabled: true}}>
-       <Tab.Screen name="store" component={store}/>
-       <Tab.Screen name="subscribed" component={subscribed}/>
-       <Tab.Screen name="my account" component={myaccount} />
-       </Tab.Navigator>
-   </SafeAreaView>
-)
+  useEffect(() => {
+    console.log("in main > route.params.topic = ", topic)
+    getChats()
+  }, [])
+
+  const block = ({ item }) => {
+    return (
+        <Pressable style={{width:80, height:20, backgroundColor:"red", marginTop:5 }} 
+        onPress={() => navigation.navigate("chats", {screenName:item.name})}>
+            <Text> {item.name}</Text>
+        </Pressable>
+    )
+}
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={data}
+        keyExtractor={item => item.id}
+        renderItem={block}
+      />
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({
-    container: {
-      backgroundColor: `black`,
-      flex: 1,
-      justifyContent: 'center',
-      //marginTop: Platform.OS === "android" ? 40 : 0,
-    },
-  });
-  
+  container: {
+    backgroundColor: `black`,
+    flex: 1,
+    justifyContent: 'center',
+    //marginTop: Platform.OS === "android" ? 40 : 0,
+  },
+})

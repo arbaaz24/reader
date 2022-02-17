@@ -12,18 +12,20 @@ import { firebaseConfig } from "./app/components/firebaseConfig"
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const Stack = createNativeStackNavigator()
-const db = getFirestore(app)
+//const db = getFirestore(app)
 
 export default App = () => {
   LogBox.ignoreLogs(['Setting a timer'])
-  const [user, setUser] = useState(null)
+  const [uid, setUser] = useState(null)
 
   const getUserDoc = async (userData) => {
-    const snap = await getDoc(doc(db, 'users', userData.uid))
-    if (snap.exists()) {
-      //console.log("in App.js , snap-->", snap.data())
-      setUser(snap.data())
-    }
+    // we aren't creating doc for user , to reduce R/W, maybe in te future..
+    // const snap = await getDoc(doc(db, 'users', userData.uid))
+    // if (snap.exists()) {
+    //   //console.log("in App.js , snap-->", snap.data())
+    //   setUser(snap.data())
+    // }
+    setUser(userData.uid)
   }
 
   useEffect(() => {
@@ -40,13 +42,13 @@ export default App = () => {
     <SafeAreaView style={styles.container}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false, cardShadowEnabled: true, gestureEnabled: true }}>
-          {user ?
+          {uid ? //since userData has nested objects, for now we are only passing the uid
             <>
-              {/* <Stack.Screen name="main" component={main} /> */}
-              <Stack.Screen name="store" component={store} initialParams={{user}} />
-              <Stack.Screen name="subscribed" component={subscribed} initialParams={{user}} />
-              <Stack.Screen name="chats" component={chats} initialParams={{user}} />
-              <Stack.Screen name="myaccount" component={myaccount} initialParams={{user}} />
+              <Stack.Screen name="store" component={store} initialParams={{uid}} />
+              <Stack.Screen name="main" component={main} />
+              <Stack.Screen name="subscribed" component={subscribed} initialParams={{uid}} />
+              <Stack.Screen name="chats" component={chats} initialParams={{uid}} />
+              <Stack.Screen name="myaccount" component={myaccount} initialParams={{uid}} />
             </>
             :
             <Stack.Screen name="login" component={login} />
