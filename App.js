@@ -41,8 +41,8 @@ export default App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false, cardShadowEnabled: true, gestureEnabled: true }}>
-          {uid ? //since userData has nested objects, for now we are only passing the uid
+        <Stack.Navigator screenOptions={{ headerShown: false, cardShadowEnabled: true, }}>
+          {true ? //replace 'true' witn 'uid'
             <>
               <Stack.Screen name="store" component={store} initialParams={{uid}} />
               <Stack.Screen name="main" component={main} />
@@ -61,9 +61,7 @@ export default App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: `black`,
     flex: 1,
     justifyContent: 'center',
-    marginTop: Platform.OS === "android" ? 40 : 0,
   },
 })

@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Image, Pressable, ScrollView, SafeAreaView, StyleSheet, Text, View, Alert } from 'react-native'
+import { FlatList, Image, Platform, Pressable, SafeAreaView, StyleSheet, Text, View, Alert } from 'react-native'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { initializeApp } from "firebase/app"
-import { getFirestore, getDoc, doc } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
 import { firebaseConfig } from "../components/firebaseConfig"
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const app = initializeApp(firebaseConfig)
-const db = getFirestore(app)
-const auth = getAuth(app)
-
 
 export default subscribed = ({ navigation, route }) => {
   const [links, setLinks] = useState([])
-  const {uid} = route.params
+  const { uid } = route.params
 
   useEffect(() => {
     console.log("in subscribed > useEffect() and uid ->", uid)
@@ -34,7 +30,6 @@ export default subscribed = ({ navigation, route }) => {
         })
         setLinks(temp3)
       }
-      else Alert.alert("You have no subscriptions...on this device")
     }
     catch (e) {
       console.log(e)
@@ -48,16 +43,16 @@ export default subscribed = ({ navigation, route }) => {
     // console.log(t)
     let t2 = t[1].split(".")
     let screenName = t2[0]
-    navigation.navigate("chats", { screenName, url: item.link})
+    navigation.navigate("chats", { screenName, url: item.link })
   }
 
   const unsubscribe = async (url) => {
-    const temp = await AsyncStorage.getItem("subscribed"+uid)
-    if(temp !== null){
+    const temp = await AsyncStorage.getItem("subscribed" + uid)
+    if (temp !== null) {
       let temp2 = JSON.parse(temp)
       //removing this url 
       temp2.splice(temp2.indexOf(url), 1)
-      await AsyncStorage.setItem("subscribed"+uid, JSON.stringify(temp2))
+      await AsyncStorage.setItem("subscribed" + uid, JSON.stringify(temp2))
       Alert.alert("Unsubscribed")
     }
     else console.log("cant find subscribed+uid")
@@ -68,7 +63,7 @@ export default subscribed = ({ navigation, route }) => {
     return (
       <Pressable
         onPress={() => goToChat({ item })}
-        onLongPress={() => unsubscribe(url) }>
+        onLongPress={() => unsubscribe(url)}>
         <Image
           style={styles.img}
           source={{
@@ -81,46 +76,108 @@ export default subscribed = ({ navigation, route }) => {
   }
 
   const goStore = () => navigation.navigate("store")
-  const goSubscribed = () => navigation.navigate("subscribed")
+  const goSubscribed = () => null //navigation.navigate("subscribed")
   const goMyAccount = () => navigation.navigate("myaccount")
   const clearAll = async () => await AsyncStorage.removeItem("subscribed" + uid)
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={{ fontWeight: "bold", fontSize: 20, color: "white" }}>
-        Subscriptions
-        <Pressable onPress={clearAll} style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }}>
-          <Text>Clear all subscriptions from local</Text>
-        </Pressable>
-      </Text>
-      <FlatList
-        //horizontal={true}
-        numColumns={3}
-        data={links}
-        keyExtractor={item => item.id}
-        renderItem={pic}
-      />
-      <View style={{ flexDirection: "row" }}>
-        <Pressable onPress={goStore} style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "orange" }} />
-        <Pressable onPress={goSubscribed} style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "orange" }} />
-        <Pressable onPress={goMyAccount} style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "orange" }} />
-      </View>
-    </SafeAreaView>
+    <>
+      <View style={styles.filler} />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.header_text}>
+            Subscribed chats
+          </Text>
+          <Pressable onPress={clearAll} style={styles.clear}>
+            <Text>Clear all </Text>
+          </Pressable>
+        </View>
+        {
+          links.length != 0 ?
+            <FlatList
+              //horizontal={true}
+              style={styles.flatlist}
+              numColumns={3}
+              data={links}
+              keyExtractor={item => item.id}
+              renderItem={pic}
+            /> :
+            <Text style={{ flex: 1 }}>
+              You have no subscriptions...on this device. Enter a chat and click on subscribe button on top
+            </Text>
+        }
+
+        <View style={styles.bottomTab}>
+          <Pressable onPress={goStore} style={styles.tabs} >
+            <Icon name="home-outline" size={30} style={styles.position} />
+          </Pressable>
+          <Pressable onPress={goSubscribed} style={[styles.tabs, { borderTopWidth: 2, borderTopColor: "#00ff00" }]} >
+            <Icon name="content-save" size={30} style={styles.position} />
+          </Pressable>
+          <Pressable onPress={goMyAccount} style={[styles.tabs, { borderRightWidth: 0 }]} >
+            <Icon name="account" size={30} style={styles.position} />
+          </Pressable>
+        </View>
+      </SafeAreaView >
+    </>
   )
 }
 
 const styles = StyleSheet.create({
+  bottomTab: {
+    flexDirection: "row"
+  },
+  clear: {
+    borderRadius: 20,
+    height: 40,
+    width: 40,
+    backgroundColor: "red"
+  },
   container: {
     alignItems: "center",
-    backgroundColor: "black",
-    flex: 1,
+    backgroundColor: `#f0f8ff`,
+    flex: 30,
     justifyContent: 'center',
-    padding: 5,
-
+    paddingTop: 0
+    // marginTop: Platform.OS === "android" ? 40 : 0,
+  },
+  filler: {
+    flex: 1,
+    backgroundColor: "#ff8c00",
+    justifyContent: "flex-end"
+  },
+  flatlist: {
+    padding: 10
+  },
+  header: {
+    backgroundColor: "#ff8c00",
+    alignSelf: "stretch",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  header_text: {
+    alignSelf: "center",
+    color: "white",
+    fontSize: 30,
+    fontStyle: "italic",
+    fontWeight: "bold",
+    marginTop: 10
+  },
+  heading: {
+    fontWeight: "bold",
+    fontSize: 20,
   },
   img: {
     borderRadius: 25,
     height: 165,
     width: 115,
+  },
+  position: {
+    alignSelf: "center"
+  },
+  tabs: {
+    borderRightWidth: 0.3,
+    height: 40,
+    flex: 1,
   }
 });

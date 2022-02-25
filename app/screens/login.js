@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, Alert, View } from "react-native"
+import { Image, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, Alert, View } from "react-native"
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons'
 import { initializeApp } from 'firebase/app'
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth"
-import { doc, getFirestore, collection, getDocs, query, getDoc, setDoc } from "firebase/firestore"
+import { getFirestore } from "firebase/firestore"
 import { firebaseConfig } from "../components/firebaseConfig"
 
 
@@ -27,7 +27,7 @@ export default login = ({ navigation, route }) => {
             console.log(e)
             if (/auth/.test(e)) Alert.alert("Invalid e-mail/password", "maybe fields are empty")
             else if (/least/.test(e)) Alert.alert("Password should be atleast 6 characters", "Your password is a little weak.")
-            else if(/disable/.test(e)) Alert.alert("Temporarily disabled",  "Too many failed Login attempts")
+            else if (/disable/.test(e)) Alert.alert("Temporarily disabled", "Too many failed Login attempts")
         }
         finally {
             if (userCredentials !== null && userCredentials.user.emailVerified) {
@@ -72,30 +72,30 @@ export default login = ({ navigation, route }) => {
     }
 
     return (
-            <View style={{ flex: 1, alignContent: "center", backgroundColor: "yellow", }}>
-                < IconMaterial name={"sign-caution"} size={30} style={{ alignSelf: "center" }} />
-                <View>
-                    <Text style={{fontSize:40}}>
-                        Sign up
-                    </Text>
-                    <TextInput placeholder="E-mail here" onChangeText={setEmail} />
-                    <TextInput placeholder="Password here" onChangeText={setPwd} />
-                    <Pressable style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "blue" }}
-                        onPress={signUp}
-                    >
-                        <Text style={{ alignSelf: "center" }}>Submit</Text>
-                    </Pressable>
-                </View>
-                <View style={{ marginTop: 25, backgroundColor: "green" }}>
-                    <Text style={{fontSize:40}}>
-                        Log in
-                    </Text>
-                    <TextInput placeholder="E-mail here" onChangeText={setEmail} />
-                    <TextInput placeholder="Password here" onChangeText={setPwd} />
-                    <Pressable style={{ borderRadius: 5, height: 40, width: 40, backgroundColor: "blue" }}
-                        onPress={signIn}
-                    ></Pressable>
-                </View>
+        <SafeAreaView style={{ flex: 1, alignContent: "center", backgroundColor: "yellow", marginTop: Platform.OS === "android" ? 40 : 0, }}>
+            < IconMaterial name={"sign-caution"} size={30} style={{ alignSelf: "center" }} />
+            <View>
+                <Text style={{ fontSize: 40 }}>
+                    Sign up
+                </Text>
+                <TextInput placeholder="E-mail here" onChangeText={setEmail} />
+                <TextInput placeholder="Password here" onChangeText={setPwd} />
+                <Pressable style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "blue" }}
+                    onPress={signUp}
+                >
+                    <Text style={{ alignSelf: "center" }}>Submit</Text>
+                </Pressable>
             </View>
+            <View style={{ marginTop: 25, backgroundColor: "green" }}>
+                <Text style={{ fontSize: 40 }}>
+                    Log in
+                </Text>
+                <TextInput placeholder="E-mail here" onChangeText={setEmail} />
+                <TextInput placeholder="Password here" onChangeText={setPwd} />
+                <Pressable style={{ borderRadius: 5, height: 40, width: 40, backgroundColor: "blue" }}
+                    onPress={signIn}
+                ></Pressable>
+            </View>
+        </SafeAreaView>
     )
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Alert, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Alert, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Icon from 'react-native-vector-icons/Ionicons'
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -9,10 +9,9 @@ import { getFirestore, getDoc, doc } from 'firebase/firestore'
 import { firebaseConfig } from "../components/firebaseConfig"
 
 const app = initializeApp(firebaseConfig)
-const db = getFirestore(app)
 
 export default chats = ({ navigation, route }) => {
-  const { screenName, uid } = route.params //url is the GCloud storage url for clicked image
+  const { screenName, topic, uid } = route.params
   const screenStart = screenName + "_start"
   const [data, setData] = useState("")
   const [limit, setLimit] = useState(null)
@@ -31,7 +30,7 @@ export default chats = ({ navigation, route }) => {
     try {
       //getting data (in JSON) from  local storage
       value = await AsyncStorage.getItem(key)
-      if (value !== null) { 
+      if (value !== null) {
         let num = 0
         //^ is our delimiter
         let temp = value.split('^')
@@ -57,7 +56,7 @@ export default chats = ({ navigation, route }) => {
       console.log("No data in local storage " + e);
     }
   }
-  
+
   const storeData = async (key, value, location) => {
     try {
       await AsyncStorage.setItem(key, value)
@@ -69,13 +68,13 @@ export default chats = ({ navigation, route }) => {
 
   const increaseLimit = async () => {
     console.log("in increaseLimit()")
-      let n = await AsyncStorage.getItem(screenStart);
-      if (n != null) {
-        setLimit(parseInt(n) + 5)
-        if (!fromTop) storeData(screenStart, (limit === null ? n :(limit).toString()), "increaseLimit()");
-        else setFromTop(false)
-      }
-      else storeData(screenStart, "0", "increaseLimit() and has been reset")
+    let n = await AsyncStorage.getItem(screenStart);
+    if (n != null) {
+      setLimit(parseInt(n) + 5)
+      if (!fromTop) storeData(screenStart, (limit === null ? n : (limit).toString()), "increaseLimit()");
+      else setFromTop(false)
+    }
+    else storeData(screenStart, "0", "increaseLimit() and has been reset")
     console.log("limit -> " + limit);
   }
 
@@ -85,12 +84,12 @@ export default chats = ({ navigation, route }) => {
     goToTop()
   }
 
-  const goToTop = () =>  flatlist.scrollToOffset({ offset: 0, animated: true }) 
+  const goToTop = () => flatlist.scrollToOffset({ offset: 0, animated: true })
 
   const downloadData = async () => {
     console.log("in downloadData()\n")
     const db = getFirestore(app)
-    const snap = await getDoc(doc(db, "movies", screenName))
+    const snap = await getDoc(doc(db, topic, screenName))
     //here, change mainString.length !=0 to download again, else it downloads only once
     if (snap.exists() && mainString.length == 0) {
       mainString = snap.get("a")
@@ -104,7 +103,7 @@ export default chats = ({ navigation, route }) => {
   useEffect(() => {
     console.log("in chats > useEffects")
     getData(screenName)
-    
+
   }, [])
 
   const render = ({ item }) => {
@@ -114,7 +113,7 @@ export default chats = ({ navigation, route }) => {
   }
 
   const removeData = async () => await AsyncStorage.removeItem(screenName)
-  
+
 
   const subscribe = async () => {
     console.log("in chats > subscribe() and uid -->", uid)
@@ -126,18 +125,27 @@ export default chats = ({ navigation, route }) => {
     else {
       let links2 = JSON.parse(links)
       //before pushing we have to make sure that the url dosen't already exist, includes("arg here is case sensitive")
-      if(links2.includes(url)) Alert.alert("Already subscribed")
+      if (links2.includes(url)) Alert.alert("Already subscribed")
       else links2.push(url)
       await AsyncStorage.setItem("subscribed" + uid, JSON.stringify(links2))
     }
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <View style={{ alignSelf: "center", backgroundColor: "yellow", fontWeight: "bold", fontSize: 20, flexDirection: "row" }}>
-          <Text>{screenStart}</Text>
-          <Pressable style={{ borderRadius: 5, height: 40, width: 40, backgroundColor: subscribed ? "blue" : "red" }}
+    <>
+      <View style={styles.filler} />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <IconMaterial name="keyboard-backspace" size={40} style={styles.back} />
+          </Pressable>
+          <Text style={styles.header_text}>{screenName}</Text>
+          <Pressable style={{
+            borderRadius: 5,
+            height: 40,
+            width: 40,
+            backgroundColor: subscribed ? "blue" : "red"
+          }}
             onPress={subscribe}>
             <Text>{subscribed ? "Unsubscribe" : "subscribe"}</Text>
           </Pressable>
@@ -156,40 +164,80 @@ export default chats = ({ navigation, route }) => {
           <Pressable
             onPressIn={increaseLimit}
             onPressOut={increaseLimit}
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "green" }}>
-            <Icon name="arrow-down" size={30} style={{ alignSelf: "center" }} />
+            style={[styles.buttons, { backgroundColor: "green" }]}>
+            <Icon name="arrow-down" size={30} style={styles.position} />
           </Pressable>
 
           <Pressable onPressIn={goToTop}
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "orange" }}>
-            <Icon name="arrow-up" size={30} style={{ alignSelf: "center" }} />
+            style={[styles.buttons, { backgroundColor: "orange" }]}>
+            <Icon name="arrow-up" size={30} style={styles.position} />
           </Pressable>
 
           {/*need to remove under button when in production*/}
           <Pressable
             onPressIn={restart}
             onPressOut={increaseLimit}
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "red" }} >
-            <IconMaterial name="delete" size={30} style={{ alignSelf: "center" }} />
+            style={[styles.buttons, { backgroundColor: "blue" }]} >
+            <Icon name="md-refresh-sharp" size={30} style={styles.position} />
           </Pressable>
 
           <Pressable
             onPressIn={removeData}
             onPressOut={removeData}//maybe i can remove this extra press
-            style={{ borderRadius: 20, height: 40, width: 40, backgroundColor: "blue" }} >
-            <Icon name="md-refresh-sharp" size={30} style={{ alignSelf: "center" }} />
+            style={[styles.buttons, { backgroundColor: "red" }]} >
+            <IconMaterial name="delete" size={30} style={styles.position} />
           </Pressable>
         </View>
-      </View>
-    </SafeAreaView>
-  );
+      </SafeAreaView>
+    </>
+  )
 
 }
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: `#fffaf0`,
-    flex: 1,
+    alignItems: "center",
+    backgroundColor: `#f0f8ff`,
+    flex: 30,
     justifyContent: 'center',
+    //padding: 10,
+    paddingTop: 0,
     //marginTop: Platform.OS === "android" ? 40 : 0,
   },
+  back:{
+    backgroundColor:"#7fffd4",
+    borderWidth:1,
+    marginTop:10,
+    borderBottomLeftRadius:10
+  },
+  buttons: {
+    borderRadius: 20,
+    height: 40,
+    width: 40,
+  },
+  filler: {
+    flex: 1,
+    backgroundColor: "#ff69b4",
+    justifyContent: "flex-end"
+  },
+  header: {
+    backgroundColor: "#ff69b4",
+    alignSelf: "stretch",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    flexDirection: "row"
+  },
+  header_text: {
+    alignSelf: "center",
+    color: "white",
+    flex:1,
+    fontSize: 20,
+    fontStyle: "italic",
+    fontWeight: "bold",
+    textTransform:"capitalize",
+    marginTop:10,
+    marginLeft:20
+  },
+  position: {
+    alignSelf: "center"
+  }
 });
