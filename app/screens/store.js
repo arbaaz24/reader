@@ -13,7 +13,7 @@ export default store = ({ navigation, route }) => {
     const [links, setlinks] = useState([])
 
     const getLinks = () => {
-        let data = [{ "description": "Enter bakstage of a movie, where characters communicate in a group chat.", "id": "1", "name": "movies" }, { "description": "Discover the density of Volumes we have to offer.", "id": "2", "name": "series" }, { "description": "Love books? Awesome! cause we don’t, so we made a few changes to your favorite books and offer a smaller version in the form of a group chat.", "id": "3", "name": 'books' }, { "description": "We provide links in all areas of academics to make the subject more interesting. Includes small tests b/w each chat to keep you sharp. Meet characters on the way that are always there to make things fun.", "id": "4", "name": 'education' }]
+        let data = [{ "description": "Enter bakstage of a movie, where characters  communicate  in a group chat.", "id": "1", "name": "movies" }, { "description": "Discover the density of Volumes we have to offer.", "id": "2", "name": "series" }, { "description": "Love books? Awesome! cause we don’t, so we made a few changes to your favorite books and offer a smaller version in the form of a group chat.", "id": "3", "name": 'books' }, { "description": "We provide links in all areas of academics to make the subject more interesting. Includes small tests b/w each chat to keep you sharp. Meet characters on the way that are always there to make things fun.", "id": "4", "name": 'education' }]
         setlinks(data)
     }
 
@@ -21,11 +21,14 @@ export default store = ({ navigation, route }) => {
 
     const block = ({ item }) => {
         return (
-            <Pressable style={styles.block}
-                onPress={() => goToMain({ item })}>
-                <Text style={{ fontSize: 20, textTransform: "capitalize" }}> {item.name}</Text>
-                <Text sty>{item.description}</Text>
-            </Pressable>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", padding:4 }}>
+                <Pressable style={({ pressed }) => [styles.block, { backgroundColor: pressed ? 'rgb(210, 230, 255)': '#00bfff'}]}
+                    onPress={() => goToMain({ item })}>
+                    <Text style={styles.name}> {item.name}</Text>
+                </Pressable>
+                <Text style={styles.descrptn}>{item.description}</Text>
+
+            </View>
         )
     }
 
@@ -71,8 +74,8 @@ export default store = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     block: {
-        alignSelf: 'stretch',
-        backgroundColor: "red",
+        //alignSelf: 'stretch',
+        backgroundColor: "#00bfff",
         marginTop: 5,
         borderRadius: 18,
         padding: 9,
@@ -87,16 +90,20 @@ const styles = StyleSheet.create({
         // marginTop: Platform.OS === "android" ? 40 : 0,
 
     },
+    descrptn: {
+        fontSize: 15,
+        fontWeight: "500",
+    },
     filler: {
         flex: 1,
-        backgroundColor: "#ff8c00",
+        backgroundColor: "#90ee90",
         justifyContent: "flex-end"
     },
     flatlist: {
         padding: 10
     },
     header: {
-        backgroundColor: "#ff8c00",
+        backgroundColor: "#90ee90",
         alignSelf: "stretch",
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
@@ -107,12 +114,18 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontStyle: "italic",
         fontWeight: "bold",
-        marginTop:10 
+        marginTop: 10
     },
     img: {
         borderRadius: 25,
         height: 165,
         width: 115
+    },
+    name: {
+        color: "white",
+        fontSize: 20,
+        fontWeight: "bold",
+        textTransform: "capitalize"
     },
     position: {
         alignSelf: "center"

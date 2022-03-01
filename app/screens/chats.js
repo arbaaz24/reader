@@ -11,7 +11,7 @@ import { firebaseConfig } from "../components/firebaseConfig"
 const app = initializeApp(firebaseConfig)
 
 export default chats = ({ navigation, route }) => {
-  const { screenName, topic, uid } = route.params
+  const { screenName, topic, uid, name } = route.params
   const screenStart = screenName + "_start"
   const [data, setData] = useState("")
   const [limit, setLimit] = useState(null)
@@ -139,7 +139,7 @@ export default chats = ({ navigation, route }) => {
           <Pressable onPress={() => navigation.goBack()}>
             <IconMaterial name="keyboard-backspace" size={40} style={styles.back} />
           </Pressable>
-          <Text style={styles.header_text}>{screenName}</Text>
+          <Text style={styles.header_text}>{name}</Text>
           <Pressable style={{
             borderRadius: 5,
             height: 40,
@@ -157,7 +157,7 @@ export default chats = ({ navigation, route }) => {
           renderItem={render}
         />
         <View style={{
-          padding: 0,
+          padding: 2,
           justifyContent: "center",
           flexDirection: "row",
         }}>
@@ -200,12 +200,11 @@ const styles = StyleSheet.create({
     flex: 30,
     justifyContent: 'center',
     //padding: 10,
-    paddingTop: 0,
+    //paddingTop: 0,
     //marginTop: Platform.OS === "android" ? 40 : 0,
   },
   back:{
-    backgroundColor:"#7fffd4",
-    borderWidth:1,
+    backgroundColor:"wheat",
     marginTop:10,
     borderBottomLeftRadius:10
   },
@@ -216,11 +215,11 @@ const styles = StyleSheet.create({
   },
   filler: {
     flex: 1,
-    backgroundColor: "#ff69b4",
+    backgroundColor: "wheat",
     justifyContent: "flex-end"
   },
   header: {
-    backgroundColor: "#ff69b4",
+    backgroundColor: "wheat",
     alignSelf: "stretch",
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
@@ -228,8 +227,9 @@ const styles = StyleSheet.create({
   },
   header_text: {
     alignSelf: "center",
-    color: "white",
+    color: "#483d8b",
     flex:1,
+    fontFamily:"normal",
     fontSize: 20,
     fontStyle: "italic",
     fontWeight: "bold",

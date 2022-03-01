@@ -22,10 +22,22 @@ export default main = ({ navigation, route }) => {
     getChats()
   }, [])
 
+  const goToChats = ({item}) => {
+    let str = item.name.split(' ').join('').toLowerCase()
+    navigation.navigate("chats", { screenName: str, topic, "name":item.name })
+  }
+
   const block = ({ item }) => {
     return (
-      <Pressable style={styles.block}
-        onPress={() => navigation.navigate("chats", { screenName: item.name, topic })}>
+      <Pressable style={({ pressed }) => [
+        styles.block,
+        {
+            backgroundColor: pressed
+                ? 'rgb(210, 230, 255)'
+                : '#00bfff'
+        }
+    ]}
+        onPress={() => goToChats({item})} >
         <Text> {item.name}</Text>
       </Pressable>
     )
@@ -54,14 +66,12 @@ export default main = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   back: {
-    backgroundColor:"#7fffd4",
-    borderWidth:1,
+    backgroundColor:"#90ee90",
     marginTop:10,
     borderBottomLeftRadius:10
   },
   block: {
     alignSelf: 'stretch',
-    backgroundColor: "red",
     marginTop: 5,
     borderRadius: 18,
     padding: 9
@@ -76,14 +86,14 @@ const styles = StyleSheet.create({
   },
   filler: {
     flex: 1,
-    backgroundColor: "#ffa500",
+    backgroundColor: "#90ee90",
     justifyContent: "flex-end"
   },
   flatlist:{
     padding:10
   },
   header: {
-    backgroundColor: "#ffa500",
+    backgroundColor: "#90ee90",
     alignSelf: "stretch",
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,

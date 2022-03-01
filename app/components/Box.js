@@ -1,47 +1,51 @@
 import React from "react";
 
-import {Image, StyleSheet, Text, View} from "react-native";
-   const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`,`#ff0000`]
-   const align = ["flex-start", "flex-end"]
-   const margin = [7, 0]
+import { Image, StyleSheet, Text, View } from "react-native";
+const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`, `#ff0000`]
+const align = ["flex-start", "flex-end"]
+const margin = [7, 0]
 export default Box = ({ item, limit }) => {
-    return (
-      <View style={{ padding: 4 }}>
-        {(parseInt(item.id) <= limit)  ?
-         !/photo/.test(item.name)  ?//!photo
-          <View style={{
+  return (
+    <View style={{ padding: 3 }}>
+      {(parseInt(item.id) <= limit) ?
+        !/photo/.test(item.name) ?//!photo
+          <View style={[styles.box, {
             alignSelf: align[parseInt(item.id) % 2],
-            borderRadius: 10,
-            maxWidth: "90%",
-            padding: 8,
-            backgroundColor: "white",
             marginLeft: margin[parseInt(item.id) % 2],
             marginRight: margin[parseInt(item.id) % 2],
-          }}>
-            <Text style={{ fontWeight: "bold",  color: colors[parseInt(item.id) % 8] }}>
+          }]}>
+            <Text style={{ fontSize:15, fontWeight: "normal", color: colors[parseInt(item.id) % 8] }}>
               {item.name}
             </Text>
-            <Text>
+            <Text style={{ fontSize: 15, fontWeight: "900" }}>
               {/* {item.id} */}
               {item.words}
             </Text>
           </View>
           :
-          <Image style={styles.img} 
+          <Image style={styles.img}
             source={{
-                uri: item.words,
-            }}/>
-          :
-          null
-        }
-      </View>
-    )
+              uri: item.words,
+            }} />
+        :
+        null
+      }
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-    img:{
-      height:50, 
-      width:50, 
-      alignSelf:"center"
-    }
+  box: {
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+    maxWidth: "90%",
+    padding: 6,
+    backgroundColor: "white",
+
+  },
+  img: {
+    height: 50,
+    width: 50,
+    alignSelf: "center"
+  }
 })
