@@ -24,8 +24,8 @@ export default subscribed = ({ navigation, route }) => {
         let temp2 = JSON.parse(temp0)
         let temp3 = []
         let index = 0
-        temp2.forEach(url => {
-          temp3.push({ id: index.toString(), link: url })
+        temp2.forEach(name => {
+          temp3.push({ id: index.toString(), name })
           index += 1
         })
         setLinks(temp3)
@@ -38,39 +38,36 @@ export default subscribed = ({ navigation, route }) => {
   }
 
   const goToChat = ({ item }) => {
-    let s = item.link
-    let t = s.split("%2F")
-    // console.log(t)
-    let t2 = t[1].split(".")
-    let screenName = t2[0]
-    navigation.navigate("chats", { screenName, url: item.link })
+    let screenName = item.name.split(' ').join('').toLowerCase()
+    navigation.navigate("chats", { screenName, "name": item.name })
   }
 
-  const unsubscribe = async (url) => {
+  const unsubscribe = async (name) => {
     const temp = await AsyncStorage.getItem("subscribed" + uid)
     if (temp !== null) {
       let temp2 = JSON.parse(temp)
-      //removing this url 
-      temp2.splice(temp2.indexOf(url), 1)
+      //removing this name 
+      temp2.splice(temp2.indexOf(name), 1)
       await AsyncStorage.setItem("subscribed" + uid, JSON.stringify(temp2))
       Alert.alert("Unsubscribed")
     }
     else console.log("cant find subscribed+uid")
   }
 
-  const pic = ({ item }) => {
-    let url = item.link
+  const block = ({ item }) => {
     return (
-      <Pressable
+      <Pressable style={({ pressed }) => [
+        styles.block,
+        {
+          backgroundColor: pressed
+            ? 'rgb(210, 230, 255)'
+            : 'white'
+        }
+      ]}
         onPress={() => goToChat({ item })}
-        onLongPress={() => unsubscribe(url)}>
-        <Image
-          style={styles.img}
-          source={{
-            uri: url,
-          }}
-          resizeMode="contain"
-        />
+        onLongPress={() => unsubscribe(item.name)}>
+        <Text style={styles.name}> {item.name}</Text>
+        {/* <Text style={styles.name2}>Author/Screenplay : {item.author} </Text> */}
       </Pressable>
     )
   }
@@ -88,22 +85,22 @@ export default subscribed = ({ navigation, route }) => {
           <Text style={styles.header_text}>
             Subscribed chats
           </Text>
-          <Pressable onPress={clearAll} style={styles.clear}>
-            <Text>Clear all </Text>
-          </Pressable>
         </View>
         {
           links.length != 0 ?
-            <FlatList
-              //horizontal={true}
-              style={styles.flatlist}
-              numColumns={3}
-              data={links}
-              keyExtractor={item => item.id}
-              renderItem={pic}
-            /> :
-            <Text style={{ flex: 1 }}>
-              You have no subscriptions...on this device. Enter a chat and click on subscribe button on top
+            <>
+              <Pressable onPress={clearAll} style={styles.clear}>
+                <Text style={styles.buttonText}>Clear all </Text>
+              </Pressable>
+              <FlatList
+                style={styles.flatlist}
+                data={links}
+                keyExtractor={item => item.id}
+                renderItem={block}
+              />
+            </> :
+            <Text style={{fontSize:20, fontWeight:"bold", color:"#483d8b", flex: 1, padding:30 }}>
+              You have no subscriptions on this device. Enter a chat and click the subscribe button.
             </Text>
         }
 
@@ -124,14 +121,28 @@ export default subscribed = ({ navigation, route }) => {
 }
 
 const styles = StyleSheet.create({
+  block: {
+    alignSelf: 'stretch',
+    flex: 1,
+    marginTop: 5,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    padding: 9
+  },
   bottomTab: {
     flexDirection: "row"
   },
+  buttonText: {
+    alignSelf: "center",
+    fontWeight: "bold",
+    color: "white",
+    fontSize: 15,
+  },
   clear: {
     borderRadius: 20,
-    height: 40,
-    width: 40,
-    backgroundColor: "red"
+    backgroundColor: "red",
+    marginTop:5,
+    padding: 5,
   },
   container: {
     alignItems: "center",
@@ -152,6 +163,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "#ff8c00",
     alignSelf: "stretch",
+    alignContent: "space-around",
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },
@@ -171,6 +183,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     height: 165,
     width: 115,
+  },
+  name: {
+    fontWeight: "bold",
+    fontSize: 17
   },
   position: {
     alignSelf: "center"

@@ -120,13 +120,13 @@ export default chats = ({ navigation, route }) => {
     setSubscribed(true)
     let links = await AsyncStorage.getItem("subscribed" + uid)
     if (links === null) {
-      await AsyncStorage.setItem("subscribed" + uid, JSON.stringify([url]))
+      await AsyncStorage.setItem("subscribed" + uid, JSON.stringify([name]))
     }
     else {
       let links2 = JSON.parse(links)
-      //before pushing we have to make sure that the url dosen't already exist, includes("arg here is case sensitive")
-      if (links2.includes(url)) Alert.alert("Already subscribed")
-      else links2.push(url)
+      //before pushing we have to make sure that the name dosen't already exist, includes("arg here is case sensitive")
+      if (links2.includes(name)) Alert.alert("Already subscribed")
+      else links2.push(name)
       await AsyncStorage.setItem("subscribed" + uid, JSON.stringify(links2))
     }
   }
@@ -141,13 +141,13 @@ export default chats = ({ navigation, route }) => {
           </Pressable>
           <Text style={styles.header_text}>{name}</Text>
           <Pressable style={{
-            borderRadius: 5,
-            height: 40,
-            width: 40,
-            backgroundColor: subscribed ? "blue" : "red"
+            alignSelf:"center",
+            borderRadius: 10,
+            backgroundColor: subscribed ? "gold" : "yellow",
+            padding:5
           }}
             onPress={subscribe}>
-            <Text>{subscribed ? "Unsubscribe" : "subscribe"}</Text>
+            <Text style={{fontWeight:"bold", fontSize:15}}>{subscribed ? "Unsubscribe" : "subscribe"}</Text>
           </Pressable>
         </View>
         <FlatList

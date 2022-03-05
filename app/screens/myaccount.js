@@ -32,11 +32,11 @@ export default myaccount = ({ navigation, route }) => {
                     <Text style={styles.header_text}>
                         My Account
                     </Text>
+                </View>
                     <Pressable style={styles.logout}
                         onPress={logOut}>
-                        <Text style={styles.position}>Sign Out</Text>
+                        <Text style={styles.sign}>Sign Out</Text>
                     </Pressable>
-                </View>
                 <View style={{ flex: 1 }}></View>
                 <View style={styles.bottomTab}>
                     <Pressable onPress={goStore} style={styles.tabs} >
@@ -88,12 +88,18 @@ const styles = StyleSheet.create({
     },
     logout: {
         borderRadius: 5,
-        height: 60,
-        width: 60,
-        backgroundColor: "red"
+        backgroundColor: "red",
+        marginTop:5,
+        padding:5,
     },
     position: {
         alignSelf: "center"
+    },
+    sign:{
+        alignSelf:"center",
+        fontWeight:"bold",
+        color:"white",
+        fontSize:15,
     },
     tabs: {
         borderRightWidth: 0.3,

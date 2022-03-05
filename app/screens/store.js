@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 // import { getStorage, ref, list, getDownloadURL } from "firebase/storage";
 import { initializeApp } from 'firebase/app'
 import { firebaseConfig } from "../components/firebaseConfig"
@@ -21,8 +21,8 @@ export default store = ({ navigation, route }) => {
 
     const block = ({ item }) => {
         return (
-            <View style={{ flexDirection: "row", flexWrap: "wrap", padding:4 }}>
-                <Pressable style={({ pressed }) => [styles.block, { backgroundColor: pressed ? 'rgb(210, 230, 255)': '#00bfff'}]}
+            <View style={{ flexDirection: "row", flexWrap: "wrap", padding: 4 }}>
+                <Pressable style={({ pressed }) => [styles.block, { backgroundColor: pressed ? 'rgb(210, 230, 255)' : '#00bfff' }]}
                     onPress={() => goToMain({ item })}>
                     <Text style={styles.name}> {item.name}</Text>
                 </Pressable>
@@ -77,8 +77,9 @@ const styles = StyleSheet.create({
         //alignSelf: 'stretch',
         backgroundColor: "#00bfff",
         marginTop: 5,
-        borderRadius: 18,
-        padding: 9,
+        borderTopLeftRadius: 14,
+        borderTopRightRadius: 14,
+        padding: 5,
 
     },
     container: {
@@ -136,4 +137,4 @@ const styles = StyleSheet.create({
         flex: 1,
 
     }
-});
+})

@@ -22,9 +22,9 @@ export default main = ({ navigation, route }) => {
     getChats()
   }, [])
 
-  const goToChats = ({item}) => {
+  const goToChats = ({ item }) => {
     let str = item.name.split(' ').join('').toLowerCase()
-    navigation.navigate("chats", { screenName: str, topic, "name":item.name })
+    navigation.navigate("chats", { screenName: str, topic, "name": item.name })
   }
 
   const block = ({ item }) => {
@@ -32,13 +32,14 @@ export default main = ({ navigation, route }) => {
       <Pressable style={({ pressed }) => [
         styles.block,
         {
-            backgroundColor: pressed
-                ? 'rgb(210, 230, 255)'
-                : '#00bfff'
+          backgroundColor: pressed
+            ? 'rgb(210, 230, 255)'
+            : 'white'
         }
-    ]}
-        onPress={() => goToChats({item})} >
-        <Text> {item.name}</Text>
+      ]}
+        onPress={() => goToChats({ item })} >
+        <Text style={styles.name}> {item.name}</Text>
+        <Text style={styles.name2}>Writer : {item.author} </Text>
       </Pressable>
     )
   }
@@ -54,7 +55,7 @@ export default main = ({ navigation, route }) => {
           <Text style={styles.header_text}> {topic} </Text>
         </View>
         <FlatList
-        style={styles.flatlist}
+          style={styles.flatlist}
           data={data}
           keyExtractor={item => item.id}
           renderItem={block}
@@ -66,14 +67,15 @@ export default main = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   back: {
-    backgroundColor:"#90ee90",
-    marginTop:10,
-    borderBottomLeftRadius:10
+    backgroundColor: "#90ee90",
+    marginTop: 10,
+    borderBottomLeftRadius: 10
   },
   block: {
     alignSelf: 'stretch',
     marginTop: 5,
-    borderRadius: 18,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
     padding: 9
   },
   container: {
@@ -89,8 +91,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#90ee90",
     justifyContent: "flex-end"
   },
-  flatlist:{
-    padding:10
+  flatlist: {
+    padding: 10
   },
   header: {
     backgroundColor: "#90ee90",
@@ -105,7 +107,14 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontStyle: "italic",
     fontWeight: "bold",
-    marginLeft:20,
-    textTransform:"capitalize"
+    marginLeft: 20,
+    textTransform: "capitalize"
+  },
+  name:{
+    fontWeight:"bold",
+    fontSize:17
+  },
+  name2:{
+    fontWeight:"normal"
   }
 })

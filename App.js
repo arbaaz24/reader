@@ -5,7 +5,6 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { chats, main, store, myaccount, subscribed, login } from "./app/screens"
 import { initializeApp } from 'firebase/app'
-import { doc, getDoc, getFirestore, query } from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { firebaseConfig } from "./app/components/firebaseConfig"
 
@@ -42,7 +41,7 @@ export default App = () => {
     <SafeAreaView style={styles.container}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false, cardShadowEnabled: true, }}>
-          {true ? //replace 'true' witn 'uid'
+          {uid ? //replace 'true' witn 'uid'
             <>
               <Stack.Screen name="store" component={store} initialParams={{uid}} />
               <Stack.Screen name="main" component={main} />
