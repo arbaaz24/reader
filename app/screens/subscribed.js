@@ -89,9 +89,10 @@ export default subscribed = ({ navigation, route }) => {
         {
           links.length != 0 ?
             <>
-              <Pressable onPress={clearAll} style={styles.clear}>
+              {/* <Pressable onPress={clearAll} style={styles.clear}>
                 <Text style={styles.buttonText}>Clear all </Text>
-              </Pressable>
+              </Pressable> */}
+              <Text style={{ fontWeight: "bold", color: "#483d8b", padding:5 }}>Long press a chat to Unsubscribe</Text>
               <FlatList
                 style={styles.flatlist}
                 data={links}
@@ -99,8 +100,16 @@ export default subscribed = ({ navigation, route }) => {
                 renderItem={block}
               />
             </> :
-            <Text style={{fontSize:20, fontWeight:"bold", color:"#483d8b", flex: 1, padding:30 }}>
-              You have no subscriptions on this device. Enter a chat and click the subscribe button.
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: "#483d8b", flex: 1, padding: 30 }}>
+              You have no subscriptions on this device. Enter a chat and click the
+              <Pressable style={{
+                alignSelf: "center",
+                borderRadius: 10,
+                backgroundColor: "yellow",
+                padding: 5
+              }}>
+                <Text style={{ fontWeight: "bold", fontSize: 15 }}>subscribe</Text>
+              </Pressable> button.
             </Text>
         }
 
@@ -141,7 +150,7 @@ const styles = StyleSheet.create({
   clear: {
     borderRadius: 20,
     backgroundColor: "red",
-    marginTop:5,
+    marginTop: 5,
     padding: 5,
   },
   container: {

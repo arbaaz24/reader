@@ -13,7 +13,7 @@ export default store = ({ navigation, route }) => {
     const [links, setlinks] = useState([])
 
     const getLinks = () => {
-        let data = [{ "description": "Enter bakstage of a movie, where characters  communicate  in a group chat.", "id": "1", "name": "movies" }, { "description": "Discover the density of Volumes we have to offer.", "id": "2", "name": "series" }, { "description": "Love books? Awesome! cause we don’t, so we made a few changes to your favorite books and offer a smaller version in the form of a group chat.", "id": "3", "name": 'books' }, { "description": "We provide links in all areas of academics to make the subject more interesting. Includes small tests b/w each chat to keep you sharp. Meet characters on the way that are always there to make things fun.", "id": "4", "name": 'education' }]
+        let data = [{ "description": "Enter bakstage of a movie, where characters communicate in a group chat.", "id": "1", "name": "movies" }, { "description": "Discover the density of volumes we have to offer.", "id": "2", "name": "series" }, { "description": "Love books? Awesome! cause we don’t, so we made a few changes to your favorite books and offer a smaller version in the form of a group chat.", "id": "3", "name": 'books' }, { "description": "We provide links in all areas of academics to make the subject easy and fun. Includes small tests to keep you sharp.", "id": "4", "name": 'education' }]
         setlinks(data)
     }
 

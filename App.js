@@ -45,8 +45,8 @@ export default App = () => {
             <>
               <Stack.Screen name="store" component={store} initialParams={{uid}} />
               <Stack.Screen name="main" component={main} />
-              <Stack.Screen name="subscribed" component={subscribed} initialParams={{uid}} />
               <Stack.Screen name="chats" component={chats} initialParams={{uid}} />
+              <Stack.Screen name="subscribed" component={subscribed} initialParams={{uid}} />
               <Stack.Screen name="myaccount" component={myaccount} initialParams={{uid}} />
             </>
             :

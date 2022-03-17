@@ -112,7 +112,7 @@ export default chats = ({ navigation, route }) => {
     )
   }
 
-  const removeData = async () => await AsyncStorage.removeItem(screenName)
+  // const removeData = async () => await AsyncStorage.removeItem(screenName)
 
 
   const subscribe = async () => {
@@ -147,7 +147,7 @@ export default chats = ({ navigation, route }) => {
             padding:5
           }}
             onPress={subscribe}>
-            <Text style={{fontWeight:"bold", fontSize:15}}>{subscribed ? "Unsubscribe" : "subscribe"}</Text>
+            <Text style={{fontWeight:"bold", fontSize:15}}>{subscribed ? "subscribed" : "subscribe"}</Text>
           </Pressable>
         </View>
         <FlatList
@@ -158,14 +158,21 @@ export default chats = ({ navigation, route }) => {
         />
         <View style={{
           padding: 2,
-          justifyContent: "center",
+          justifyContent: "space-around",
           flexDirection: "row",
         }}>
           <Pressable
             onPressIn={increaseLimit}
             onPressOut={increaseLimit}
-            style={[styles.buttons, { backgroundColor: "green" }]}>
+            style={[styles.buttons, { backgroundColor: "green", marginRight:"25%" }]}>
             <Icon name="arrow-down" size={30} style={styles.position} />
+          </Pressable>
+
+          <Pressable
+            onPressIn={restart}
+            onPressOut={increaseLimit}
+            style={[styles.buttons, { backgroundColor: "blue", marginRight:"25%" }]} >
+            <Icon name="md-refresh-sharp" size={30} style={styles.position} />
           </Pressable>
 
           <Pressable onPressIn={goToTop}
@@ -174,19 +181,12 @@ export default chats = ({ navigation, route }) => {
           </Pressable>
 
           {/*need to remove under button when in production*/}
-          <Pressable
-            onPressIn={restart}
-            onPressOut={increaseLimit}
-            style={[styles.buttons, { backgroundColor: "blue" }]} >
-            <Icon name="md-refresh-sharp" size={30} style={styles.position} />
-          </Pressable>
-
-          <Pressable
+          {/* <Pressable
             onPressIn={removeData}
             onPressOut={removeData}//maybe i can remove this extra press
             style={[styles.buttons, { backgroundColor: "red" }]} >
             <IconMaterial name="delete" size={30} style={styles.position} />
-          </Pressable>
+          </Pressable> */}
         </View>
       </SafeAreaView>
     </>
