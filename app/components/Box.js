@@ -1,25 +1,51 @@
 import React from "react";
-import {
-   Text, View} from "react-native";
-export default Box = ({ item }) => {
-    const colors = [`#90ee90`, `#e0ffff`, `#7fffd4`, `#f0f8ff`, `#afeeee`, `#00ff7f`, `#40e0d0`, `#ffc0cb`];
-    const align = ["flex-start", "flex-end"];
-    const margin = [7, 0];
-    return (
-        <View style={{ padding: 4 }}>
-            {(parseInt(item.id) <= 50) ? //using ternary inside a ternary oprtr
-                <View style={{ alignSelf: align[parseInt(item.id) % 2], maxWidth: "90%", backgroundColor: colors[parseInt(item.id) % 2], borderRadius: 10, marginLeft: margin[parseInt(item.id) % 2], marginRight: margin[parseInt(item.id) % 2], padding: 10 }}>
-                    <Text style={{ fontWeight: "bold" }}>
-                        {item.name}
-                    </Text>
-                    <Text >
-                        {item.id}
-                        {item.words}
-                    </Text>
-                </View>
-                :
-                null
-            }
-        </View>
-    );
-};
+
+import { Linking, StyleSheet, Text, View } from "react-native";
+const colors = [`#0000ff`, `#a52a2a`, `#ff1493`, `#ff8c00`, `#ff00ff`, `#006400`, `#8b008b`, `#ff0000`]
+const align = ["flex-start", "flex-end"]
+const margin = [7, 0]
+export default Box = ({ item, limit }) => {
+  return (
+    <View style={{ padding: 3 }}>
+      {(parseInt(item.id) <= limit) ?
+        !/link/.test(item.name) ?//!photo -- for photo we can add code later
+          <View style={[styles.box, {
+            alignSelf: align[parseInt(item.id) % 2],
+            marginLeft: margin[parseInt(item.id) % 2],
+            marginRight: margin[parseInt(item.id) % 2],
+          }]}>
+            <Text style={{ fontSize: 15, fontWeight: "normal", color: colors[parseInt(item.id) % 8] }}>
+              {item.name}
+            </Text>
+            <Text style={{ fontSize: 15, fontWeight: "900" }}>
+              {/* {item.id} */}
+              {item.words}
+            </Text>
+          </View>
+          :
+          <Text style={{ color: 'blue' }}
+            onPress={() => Linking.openURL(item.words)}>
+            {item.words}
+          </Text>
+        :
+        null
+      }
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  box: {
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+    maxWidth: "90%",
+    padding: 6,
+    backgroundColor: "white",
+
+  },
+  img: {
+    height: 50,
+    width: 50,
+    alignSelf: "center"
+  }
+})
