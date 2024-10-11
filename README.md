@@ -1,3 +1,4 @@
+<h2>A cross-platform application that makes it amusing to read through verbose and lengthy screenplays, transcripts and books. </h2>
 <h3 alin="center">The Sign up/Log in page that allows users to setup account and access content.</h3>
 <h4 align="center">the forgot password functionality works with help from Firebase code snippets for ReactNative</h4>
 
