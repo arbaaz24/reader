@@ -30,4 +30,4 @@
 
 ![ss7](https://github.com/arbaaz24/reader/assets/54056777/6c540dc8-9ea5-42c6-94a5-326828d99138)
 
-</h3 align="center">As an indie developer who wanted to publish this app. on Google Playstore, I was met with a surprise that Google updated its policy to allow apps. that have atleast a team of 20 people who will test the app for 14 days before it is officially on the store. I dont have a team of 20 or 20 jobless friends who will work for me. Maybe next time, Cheers. </h3>
+
